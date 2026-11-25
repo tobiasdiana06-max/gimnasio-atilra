@@ -1,0 +1,15 @@
+﻿@import "tailwindcss";
+
+@theme {
+  --color-atilra-carbon: #292929;
+  --color-atilra-green: #9AC201;
+  --color-atilra-green-dark: #7EA100;
+  --color-atilra-green-light: #7FC35C;
+  --color-atilra-gray: #606062;
+}
+
+body {
+  background-color: #f4f6f4;
+  color: #292929;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}

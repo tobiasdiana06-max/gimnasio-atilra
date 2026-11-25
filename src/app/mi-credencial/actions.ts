@@ -1,0 +1,77 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { guardarSesionCredencial, requerirUsuarioCredencialId, cerrarSesionCredencial } from "@/lib/auth/credencial";
+import { ALTA_MEDICA_EXTENSION_POR_MIME, ALTA_MEDICA_MAX_BYTES, ALTA_MEDICA_MAX_MB, BUCKET_ALTAS_MEDICAS } from "@/lib/constants";
+import { normalizarDni } from "@/lib/validaciones";
+import type { ResultadoAccion } from "@/types/recepcion";
+
+export async function iniciarSesionCredencial(formData: FormData): Promise<ResultadoAccion> {
+  const dni = normalizarDni(String(formData.get("dni") ?? ""));
+  const numeroLegajo = String(formData.get("numero_legajo") ?? "").trim();
+  if (dni.length < 7 || dni.length > 8) return { ok: false, error: "Ingresá un DNI válido." };
+
+  const { data, error } = await createAdminClient()
+    .from("usuarios")
+    .select("id, perfil, numero_legajo, activo")
+    .eq("dni", dni)
+    .maybeSingle();
+  if (error) return { ok: false, error: "No se pudieron verificar los datos. Probá nuevamente." };
+  if (!data || !data.activo) return { ok: false, error: "No pudimos verificar el DNI y los datos requeridos." };
+  if (data.perfil === "afiliado" && (!numeroLegajo || numeroLegajo !== String(data.numero_legajo ?? "").trim())) {
+    return { ok: false, error: "No pudimos verificar el DNI y los datos requeridos." };
+  }
+
+  await guardarSesionCredencial(data.id);
+  revalidatePath("/mi-credencial");
+  return { ok: true, mensaje: "Datos verificados." };
+}
+
+export async function salirCredencial(): Promise<void> {
+  await cerrarSesionCredencial();
+  revalidatePath("/mi-credencial");
+}
+
+function archivoFormulario(formData: FormData): File | null {
+  const candidatos = ["foto", "archivo"].map((campo) => formData.get(campo));
+  const archivos = candidatos.filter((valor): valor is File => valor instanceof File && valor.size > 0);
+  return archivos.length === 1 ? archivos[0] : null;
+}
+
+export async function subirAltaMedicaSocio(formData: FormData): Promise<ResultadoAccion> {
+  const usuarioId = await requerirUsuarioCredencialId();
+  const archivo = archivoFormulario(formData);
+  if (!archivo) return { ok: false, error: "Elegí una foto o un PDF del certificado." };
+
+  const extension = ALTA_MEDICA_EXTENSION_POR_MIME[archivo.type];
+  if (!extension) return { ok: false, error: "El archivo debe ser JPG, PNG, WEBP o PDF." };
+  if (archivo.size > ALTA_MEDICA_MAX_BYTES) {
+    return { ok: false, error: `El archivo supera el máximo de ${ALTA_MEDICA_MAX_MB} MB.` };
+  }
+
+  const supabase = createAdminClient();
+  const path = `${usuarioId}/${crypto.randomUUID()}.${extension}`;
+  const { error: errorSubida } = await supabase.storage
+    .from(BUCKET_ALTAS_MEDICAS)
+    .upload(path, Buffer.from(await archivo.arrayBuffer()), { contentType: archivo.type, upsert: false });
+  if (errorSubida) return { ok: false, error: `No se pudo subir el certificado: ${errorSubida.message}` };
+
+  const { error: errorRegistro } = await supabase.from("documentacion_medica").insert({
+    usuario_id: usuarioId,
+    estado: "pendiente",
+    origen: "app",
+    archivo_path: path,
+    archivo_nombre: archivo.name || `certificado.${extension}`,
+  });
+
+  if (errorRegistro) {
+    const { error: errorLimpieza } = await supabase.storage.from(BUCKET_ALTAS_MEDICAS).remove([path]);
+    const detalleLimpieza = errorLimpieza ? ` También falló la limpieza del archivo temporal: ${errorLimpieza.message}` : "";
+    return { ok: false, error: `No se pudo registrar el certificado: ${errorRegistro.message}.${detalleLimpieza}` };
+  }
+
+  revalidatePath("/mi-credencial");
+  revalidatePath("/recepcion", "layout");
+  return { ok: true, mensaje: "Certificado enviado. Recepción lo revisará para actualizar tu estado." };
+}
