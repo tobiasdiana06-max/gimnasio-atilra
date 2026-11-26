@@ -135,14 +135,14 @@ export function PanelAccesos({ usuarios, dniInicial }: { usuarios: UsuarioAcceso
   }
 
   return (
-    <div className="grid items-start gap-5 2xl:grid-cols-[minmax(0,1.5fr)_minmax(380px,0.8fr)]">
+    <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1.65fr)_minmax(360px,0.9fr)] 2xl:gap-6">
       <section className={cn(estilos.card, "space-y-4")}>
-        <div className="flex flex-wrap items-end justify-between gap-3">
+        <div className="grid gap-3 lg:grid-cols-[minmax(220px,1fr)_minmax(440px,1.8fr)] lg:items-end">
           <div>
             <h2 className="text-lg font-bold text-atilra-carbon">Últimas fichadas</h2>
             <p className="text-xs text-atilra-gris">Actualización automática cada 5 segundos · máximo 200 resultados.</p>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="grid gap-2 sm:grid-cols-3">
             <div><label htmlFor="acceso-desde" className={estilos.label}>Desde</label><input id="acceso-desde" type="date" value={desde} onChange={(e) => setDesde(e.target.value)} className={estilos.input} /></div>
             <div><label htmlFor="acceso-hasta" className={estilos.label}>Hasta</label><input id="acceso-hasta" type="date" value={hasta} onChange={(e) => setHasta(e.target.value)} className={estilos.input} /></div>
             <div><label htmlFor="acceso-semaforo" className={estilos.label}>Semáforo</label><select id="acceso-semaforo" value={semaforo} onChange={(e) => setSemaforo(e.target.value)} className={estilos.input}>{colores.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}</select></div>

@@ -32,9 +32,9 @@ export interface NoticiaPortal {
 
 type Seccion = "credencial" | "alta" | "noticias";
 
-function PrivacidadDatos() {
+function PrivacidadDatos({ className }: { className?: string } = {}) {
   return (
-    <section aria-labelledby="privacidad-datos" className="mt-6 rounded-2xl border border-[#9AC201]/40 bg-white p-4 text-sm text-[#292929] shadow-sm">
+    <section aria-labelledby="privacidad-datos" className={cn("mt-6 rounded-2xl border border-[#9AC201]/40 bg-white p-4 text-sm text-[#292929] shadow-sm", className)}>
       <h2 id="privacidad-datos" className="font-bold">Privacidad y tratamiento de datos</h2>
       <p className="mt-2 leading-relaxed">
         El gimnasio utiliza tus datos para gestionar la credencial, verificar el acceso, administrar la afiliación o cuota,
@@ -58,7 +58,7 @@ function PrivacidadDatos() {
   );
 }
 
-function AccesoDni() {
+function AccesoDni({ planillaUrl, planillaError }: { planillaUrl: string | null; planillaError?: string }) {
   const router = useRouter();
   const [error, setError] = useState("");
   const [ocupado, setOcupado] = useState(false);
@@ -83,8 +83,8 @@ function AccesoDni() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center border-x border-slate-200 bg-[#F4F6F4] px-5 py-8 shadow-2xl">
-      <header className="sticky top-0 mb-6 rounded-3xl border-b-4 border-[#9AC201] bg-[#292929] p-6 text-white shadow-lg">
+    <main className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center border-x border-slate-200 bg-[#F4F6F4] px-5 py-8 shadow-2xl lg:grid lg:max-w-5xl lg:grid-cols-[minmax(0,1.1fr)_minmax(380px,0.9fr)] lg:items-center lg:gap-x-10 lg:px-10 lg:shadow-xl">
+      <header className="mb-6 rounded-3xl border-b-4 border-[#9AC201] bg-[#292929] p-6 text-white shadow-lg lg:row-span-2 lg:mb-0 lg:p-8">
         <div className="flex items-center gap-3">
           <LogoAtilra className="h-11 w-11 shrink-0" />
           <div>
@@ -95,7 +95,7 @@ function AccesoDni() {
         <h1 className="mt-5 text-3xl font-black">Mi Credencial</h1>
         <p className="mt-2 text-sm text-white/75">Consultá tu estado, enviá el certificado médico y mirá las novedades.</p>
       </header>
-      <form onSubmit={(event) => void ingresar(event)} className="mx-1 space-y-4 rounded-3xl bg-white p-6 shadow-lg">
+      <form onSubmit={(event) => void ingresar(event)} className="mx-1 space-y-4 rounded-3xl bg-white p-6 shadow-lg lg:mx-0">
         <div>
           <label htmlFor="dni-credencial" className={estilos.label}>DNI</label>
           <input id="dni-credencial" name="dni" type="text" inputMode="numeric" autoComplete="username"
@@ -117,7 +117,11 @@ function AccesoDni() {
         </button>
         <p className="text-xs text-[#606062]">La sesión queda protegida en este dispositivo y vence automáticamente.</p>
       </form>
-      <PrivacidadDatos />
+      <div className="space-y-4 lg:col-start-2">
+        {planillaError && <p role="alert" className="rounded-2xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">{planillaError}</p>}
+        <BotonPlanilla url={planillaUrl} />
+        <PrivacidadDatos className="mt-0" />
+      </div>
     </main>
   );
 }
@@ -353,52 +357,57 @@ function Credencial({
                   : estado?.semaforo === "rojo" ? "#DC2626" : "#606062",
           }}
         />
-        <div className="p-6">
-          <div className="flex items-center gap-4">
-            {usuario.foto_url ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={usuario.foto_url} alt="" referrerPolicy="no-referrer" className="h-20 w-20 rounded-2xl object-cover ring-2 ring-slate-100" />
-            ) : (
-              <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-[#292929]">
-                <UserRound className="h-10 w-10 text-[#9AC201]" aria-hidden />
+        <div className="grid gap-6 p-4 sm:p-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)] lg:items-start">
+          <div className="min-w-0">
+            <div className="flex items-center gap-4">
+              {usuario.foto_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={usuario.foto_url} alt="" referrerPolicy="no-referrer" className="h-20 w-20 rounded-2xl object-cover ring-2 ring-slate-100" />
+              ) : (
+                <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-[#292929]">
+                  <UserRound className="h-10 w-10 text-[#9AC201]" aria-hidden />
+                </div>
+              )}
+              <div className="min-w-0">
+                <p className="text-xs font-bold uppercase tracking-widest text-[#606062]">Credencial digital</p>
+                <h2 className="mt-1 text-xl font-black leading-tight text-[#292929]">{usuario.nombre} {usuario.apellido}</h2>
+                <p className="mt-1 text-sm text-[#606062]">DNI {usuario.dni}</p>
               </div>
-            )}
-            <div className="min-w-0">
-              <p className="text-xs font-bold uppercase tracking-widest text-[#606062]">Credencial digital</p>
-              <h2 className="mt-1 text-xl font-black leading-tight text-[#292929]">{usuario.nombre} {usuario.apellido}</h2>
-              <p className="mt-1 text-sm text-[#606062]">DNI {usuario.dni}</p>
             </div>
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              <PerfilBadge perfil={usuario.perfil} />
+              {esAfiliado && <span className="rounded-full bg-[#9AC201]/25 px-2.5 py-1 text-xs font-bold text-[#292929]">CCT 02/88</span>}
+              {esAfiliado && usuario.numero_legajo && (
+                <span className="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-[#606062]">
+                  Legajo {usuario.numero_legajo}
+                </span>
+              )}
+            </div>
+            <TarjetaSemaforo estado={estado} />
+            <AlertaVencimientos usuario={usuario} estado={estado} hoy={hoy} />
           </div>
-          <div className="mt-4 flex flex-wrap items-center gap-2">
-            <PerfilBadge perfil={usuario.perfil} />
-            {esAfiliado && <span className="rounded-full bg-[#9AC201]/25 px-2.5 py-1 text-xs font-bold text-[#292929]">CCT 02/88</span>}
-            {esAfiliado && usuario.numero_legajo && (
-              <span className="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-[#606062]">
-                Legajo {usuario.numero_legajo}
-              </span>
-            )}
-          </div>
-          <TarjetaSemaforo estado={estado} />
-          <AlertaVencimientos usuario={usuario} estado={estado} hoy={hoy} />
-          <NotificacionesPush clavePublica={claveVapidPublica} />
-          <BotonPlanilla url={planillaUrl} />
 
-          <div className="mt-5 grid grid-cols-2 gap-3">
-            <div className="min-w-0 rounded-2xl border border-slate-100 bg-[#F4F6F4] p-3.5">
-              <div className="mb-2 flex items-center gap-2 text-[#606062]">
-                <CalendarDays className="h-4 w-4 shrink-0 text-[#7EA100]" aria-hidden />
-                <p className="text-xs font-bold leading-tight">Alta Médica</p>
+          <div className="min-w-0">
+            <NotificacionesPush clavePublica={claveVapidPublica} />
+            <BotonPlanilla url={planillaUrl} />
+
+            <div className="mt-5 grid grid-cols-2 gap-3">
+              <div className="min-w-0 rounded-2xl border border-slate-100 bg-[#F4F6F4] p-3.5">
+                <div className="mb-2 flex items-center gap-2 text-[#606062]">
+                  <CalendarDays className="h-4 w-4 shrink-0 text-[#7EA100]" aria-hidden />
+                  <p className="text-xs font-bold leading-tight">Alta Médica</p>
+                </div>
+                <p className="text-sm font-black text-[#292929]">{formatearFecha(estado?.alta_vencimiento)}</p>
               </div>
-              <p className="text-sm font-black text-[#292929]">{formatearFecha(estado?.alta_vencimiento)}</p>
-            </div>
-            <div className="min-w-0 rounded-2xl border border-slate-100 bg-[#F4F6F4] p-3.5">
-              <div className="mb-2 flex items-center gap-2 text-[#606062]">
-                <CalendarDays className="h-4 w-4 shrink-0 text-[#7EA100]" aria-hidden />
-                <p className="text-xs font-bold leading-tight">{esAfiliado ? "Afiliación" : "Cuota"}</p>
+              <div className="min-w-0 rounded-2xl border border-slate-100 bg-[#F4F6F4] p-3.5">
+                <div className="mb-2 flex items-center gap-2 text-[#606062]">
+                  <CalendarDays className="h-4 w-4 shrink-0 text-[#7EA100]" aria-hidden />
+                  <p className="text-xs font-bold leading-tight">{esAfiliado ? "Afiliación" : "Cuota"}</p>
+                </div>
+                <p className="text-sm font-black text-[#292929]">
+                  {formatearFecha(esAfiliado ? estado?.afiliacion_vencimiento : estado?.cuota_vencimiento)}
+                </p>
               </div>
-              <p className="text-sm font-black text-[#292929]">
-                {formatearFecha(esAfiliado ? estado?.afiliacion_vencimiento : estado?.cuota_vencimiento)}
-              </p>
             </div>
           </div>
         </div>
@@ -438,7 +447,7 @@ function SubirAlta() {
   }
 
   return (
-    <section className="space-y-5 rounded-3xl bg-white p-6 shadow-lg">
+    <section className="mx-auto w-full max-w-3xl space-y-5 rounded-3xl bg-white p-6 shadow-lg">
       <div className="flex items-center gap-3">
         <div className="rounded-xl bg-[#9AC201]/20 p-3"><FileUp className="h-6 w-6 text-[#7EA100]" aria-hidden /></div>
         <div>
@@ -483,11 +492,11 @@ function SubirAlta() {
 
 function Cartelera({ noticias }: { noticias: NoticiaPortal[] }) {
   return (
-    <section className="space-y-3">
-      <h2 className="flex items-center gap-2 text-xl font-black text-[#292929]">
+    <section className="grid gap-4 lg:grid-cols-2">
+      <h2 className="flex items-center gap-2 text-xl font-black text-[#292929] lg:col-span-2">
         <Newspaper className="h-5 w-5 text-[#7EA100]" aria-hidden /> Cartelera del gimnasio
       </h2>
-      {noticias.length === 0 && <div className="rounded-3xl bg-white p-6 text-sm text-[#606062] shadow-lg">No hay novedades publicadas por el momento.</div>}
+      {noticias.length === 0 && <div className="rounded-3xl bg-white p-6 text-sm text-[#606062] shadow-lg lg:col-span-2">No hay novedades publicadas por el momento.</div>}
       {noticias.map((noticia) => (
         <article key={noticia.id} className="space-y-3 rounded-3xl bg-white p-5 shadow-lg">
           <div>
@@ -528,13 +537,7 @@ export function MiCredencialPortal({
 }) {
   const [seccion, setSeccion] = useState<Seccion>("credencial");
   if (!usuario) {
-    return (
-      <>
-        <AccesoDni />
-        {planillaError && <p role="alert" className="mx-auto mt-4 max-w-md px-5 text-sm text-red-800">{planillaError}</p>}
-        <div className="mx-auto max-w-md px-5"><BotonPlanilla url={planillaUrl} /></div>
-      </>
-    );
+    return <AccesoDni planillaUrl={planillaUrl} planillaError={planillaError} />;
   }
 
   const tabs: { id: Seccion; label: string; icon: typeof BadgeCheck }[] = [
@@ -544,7 +547,7 @@ export function MiCredencialPortal({
   ];
 
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-md flex-col border-x border-slate-200 bg-[#F4F6F4] pb-24 shadow-2xl">
+    <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col border-x border-slate-200 bg-[#F4F6F4] pb-24 shadow-2xl lg:border-x-0 lg:pb-8 lg:shadow-xl">
       <header className="sticky top-0 z-30 flex items-center justify-between gap-3 bg-[#292929] px-4 py-3 text-white shadow-md">
         <div className="flex min-w-0 items-center gap-3">
           <LogoAtilra className="h-10 w-10 shrink-0" />
@@ -560,7 +563,7 @@ export function MiCredencialPortal({
         </form>
       </header>
 
-      <main className="flex-1 px-4 pb-8 pt-5">
+      <main className="mx-auto w-full max-w-5xl flex-1 px-4 pb-8 pt-5 sm:px-6 lg:px-8 lg:pt-8">
         {avisarTelefonoInvitado && usuario.perfil === "invitado" && (
           <aside role="status" className="mb-4 rounded-2xl border border-[#9AC201]/50 bg-[#9AC201]/15 p-4 text-sm text-[#292929]">
             <p className="font-bold">Agregá un teléfono para proteger tu credencial</p>
@@ -586,7 +589,7 @@ export function MiCredencialPortal({
         </footer>
       </main>
 
-      <nav aria-label="Secciones de mi credencial" className="fixed bottom-0 left-1/2 z-40 grid w-full max-w-md -translate-x-1/2 grid-cols-3 gap-1 border-x border-t border-white/10 bg-[#292929] px-2 pb-3 pt-2 shadow-2xl">
+      <nav aria-label="Secciones de mi credencial" className="fixed bottom-0 left-1/2 z-40 grid w-full max-w-6xl -translate-x-1/2 grid-cols-3 gap-1 border-x border-t border-white/10 bg-[#292929] px-2 pb-3 pt-2 shadow-2xl lg:bottom-5 lg:w-fit lg:grid-cols-[repeat(3,minmax(150px,1fr))] lg:rounded-2xl lg:border lg:pb-2">
         {tabs.map(({ id, label, icon: Icon }) => (
           <button key={id} type="button" onClick={() => setSeccion(id)} aria-current={seccion === id ? "page" : undefined}
             className={cn("flex min-h-14 flex-col items-center justify-center gap-1 rounded-xl px-1 py-2 text-[11px] font-bold transition",

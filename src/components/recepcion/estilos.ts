@@ -9,5 +9,5 @@ export const estilos = {
     "inline-flex items-center justify-center gap-2 rounded-lg border border-atilra-gris/50 bg-atilra-blanco px-4 py-2 text-sm font-semibold text-atilra-carbon transition hover:border-atilra-verde-oscuro hover:bg-atilra-fondo disabled:cursor-not-allowed disabled:opacity-60",
   btnPeligro:
     "inline-flex items-center justify-center gap-2 rounded-lg border border-semaforo-rojo px-4 py-2 text-sm font-semibold text-semaforo-rojo transition hover:bg-semaforo-rojo hover:text-white disabled:cursor-not-allowed disabled:opacity-60",
-  card: "rounded-2xl border border-atilra-gris/15 bg-atilra-blanco p-5 shadow-sm",
+  card: "rounded-2xl border border-atilra-gris/15 bg-atilra-blanco p-4 shadow-sm sm:p-5 lg:p-6",
 } as const;

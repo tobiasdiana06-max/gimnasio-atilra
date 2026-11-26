@@ -96,25 +96,27 @@ export default async function FichaUsuarioPage({ params }: { params: Promise<{ i
         )}
       </section>
 
-      <section className={cn(estilos.card, "space-y-4")}>
-        <div>
-          <h2 className="text-lg font-bold text-atilra-carbon">Cargar alta médica presencial</h2>
-          <p className="text-sm text-atilra-gris">
-            Para cuando el socio trae el certificado en papel. Queda vigente de inmediato.
-          </p>
-        </div>
-        <CargaPresencialForm usuarioId={u.id} />
-      </section>
+      <div className="grid items-start gap-6 lg:grid-cols-2">
+        <section className={cn(estilos.card, "space-y-4")}>
+          <div>
+            <h2 className="text-lg font-bold text-atilra-carbon">Cargar alta médica presencial</h2>
+            <p className="text-sm text-atilra-gris">
+              Para cuando el socio trae el certificado en papel. Queda vigente de inmediato.
+            </p>
+          </div>
+          <CargaPresencialForm usuarioId={u.id} />
+        </section>
 
-      <section className={cn(estilos.card, "space-y-3")}>
-        <div>
-          <h2 className="text-lg font-bold text-atilra-carbon">Huella biométrica</h2>
-          <p className="text-sm text-atilra-gris">
-            Estado: {u.huella_template_id ? "Enrolada" : "Sin enrolar"}.
-          </p>
-        </div>
-        <EnrolarHuellaForm usuarioId={u.id} tieneHuella={Boolean(u.huella_template_id)} />
-      </section>
+        <section className={cn(estilos.card, "space-y-3")}>
+          <div>
+            <h2 className="text-lg font-bold text-atilra-carbon">Huella biométrica</h2>
+            <p className="text-sm text-atilra-gris">
+              Estado: {u.huella_template_id ? "Enrolada" : "Sin enrolar"}.
+            </p>
+          </div>
+          <EnrolarHuellaForm usuarioId={u.id} tieneHuella={Boolean(u.huella_template_id)} />
+        </section>
+      </div>
 
       <section className={cn(estilos.card, "space-y-4")}>
         <h2 className="text-lg font-bold text-atilra-carbon">Historial de altas médicas</h2>

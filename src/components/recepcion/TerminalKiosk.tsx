@@ -141,7 +141,7 @@ export function TerminalKiosk() {
         </div>
       </header>
 
-      <div className="grid gap-6 2xl:grid-cols-[minmax(0,1.35fr)_minmax(340px,0.65fr)]">
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.6fr)_minmax(360px,0.8fr)] 2xl:gap-8">
         <section aria-live="polite" aria-label="Resultado de la última fichada">
           {fichada ? (
             <div className={cn(

@@ -68,60 +68,72 @@ export function RecepcionNav({ email, pendientes }: Props) {
   ];
 
   return (
-    <aside className="bg-atilra-carbon text-atilra-blanco md:sticky md:top-0 md:flex md:h-screen md:w-64 md:shrink-0 md:flex-col">
-      <div className="border-b-4 border-atilra-verde px-5 py-4">
-        <div className="flex items-center gap-3">
-          <LogoAtilra className="h-10 w-10 shrink-0" />
-          <div>
-            <p className="text-xs text-atilra-blanco/60">ATILRA · Gral. Rodríguez</p>
-            <p className="text-lg font-bold">Gimnasio — Recepción</p>
+    <aside className="sticky top-0 z-30 bg-atilra-carbon text-atilra-blanco shadow-md">
+      <div className="mx-auto max-w-[1440px] px-3 sm:px-5 lg:px-8">
+        <div className="flex items-center justify-between gap-3 border-b-4 border-atilra-verde py-3">
+          <div className="flex min-w-0 items-center gap-3">
+            <LogoAtilra className="h-10 w-10 shrink-0" />
+            <div className="min-w-0">
+              <p className="text-xs text-atilra-blanco/60">ATILRA · Gral. Rodríguez</p>
+              <p className="truncate text-base font-bold sm:text-lg">Gimnasio — Recepción</p>
+            </div>
+          </div>
+          <div className="hidden min-w-0 items-center gap-4 sm:flex">
+            <p className="max-w-64 truncate text-xs text-atilra-blanco/60" title={email}>{email}</p>
+            <form action={cerrarSesion}>
+              <button
+                type="submit"
+                className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-atilra-blanco/80 transition hover:bg-atilra-blanco/10 hover:text-atilra-blanco"
+              >
+                <LogOut className="h-4 w-4" aria-hidden /> Cerrar sesión
+              </button>
+            </form>
           </div>
         </div>
-      </div>
 
-      <nav className="flex gap-1 overflow-x-auto p-3 md:flex-1 md:flex-col md:overflow-visible">
-        {items.map(({ href, etiqueta, icono: Icono, activo, badge }) => (
-          <Link
-            key={href}
-            href={href}
-            aria-current={activo ? "page" : undefined}
-            className={cn(
-              "flex shrink-0 items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold transition",
-              activo
-                ? "bg-atilra-verde text-atilra-carbon"
-                : "text-atilra-blanco/80 hover:bg-atilra-blanco/10 hover:text-atilra-blanco",
-            )}
-          >
-            <Icono className="h-4 w-4" aria-hidden />
-            <span>{etiqueta}</span>
-            {badge > 0 && (
-              <span className="ml-auto rounded-full bg-semaforo-amarillo px-2 py-0.5 text-xs font-bold text-atilra-carbon">
-                {badge}
-              </span>
-            )}
-          </Link>
-        ))}
-      </nav>
+        <div className="flex items-center gap-2 py-2">
+          <nav aria-label="Navegación de recepción" className="flex min-w-0 flex-1 gap-1 overflow-x-auto lg:justify-between lg:overflow-visible">
+            {items.map(({ href, etiqueta, icono: Icono, activo, badge }) => (
+              <Link
+                key={href}
+                href={href}
+                aria-current={activo ? "page" : undefined}
+                className={cn(
+                  "flex shrink-0 items-center gap-2 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold transition lg:flex-1 lg:justify-center lg:px-2",
+                  activo
+                    ? "bg-atilra-verde text-atilra-carbon"
+                    : "text-atilra-blanco/80 hover:bg-atilra-blanco/10 hover:text-atilra-blanco",
+                )}
+              >
+                <Icono className="h-4 w-4 shrink-0" aria-hidden />
+                <span>{etiqueta}</span>
+                {badge > 0 && (
+                  <span className="rounded-full bg-semaforo-amarillo px-2 py-0.5 text-xs font-bold text-atilra-carbon">
+                    {badge}
+                  </span>
+                )}
+              </Link>
+            ))}
+          </nav>
+          <div className="hidden shrink-0 lg:block">
+            <form action={cerrarSesion}>
+              <button
+                type="submit"
+                className="inline-flex items-center gap-2 whitespace-nowrap rounded-lg border border-atilra-blanco/20 px-3 py-2 text-sm font-bold text-atilra-blanco transition hover:bg-atilra-blanco/10"
+              >
+                <LockKeyhole className="h-4 w-4" aria-hidden /> Bloquear sesión
+              </button>
+            </form>
+          </div>
+        </div>
 
-      <div className="border-t border-atilra-blanco/10 p-4">
-        <form action={cerrarSesion}>
-          <button
-            type="submit"
-            className="flex w-full items-center gap-2 rounded-lg border border-atilra-blanco/20 px-3 py-2 text-sm font-bold text-atilra-blanco transition hover:bg-atilra-blanco/10"
-          >
-            <LockKeyhole className="h-4 w-4" aria-hidden /> Bloquear sesión
-          </button>
-        </form>
-        <div className="mt-4 hidden md:block">
-          <p className="mb-2 truncate text-xs text-atilra-blanco/60" title={email}>
-            {email}
-          </p>
+        <div className="border-t border-atilra-blanco/10 py-2 lg:hidden">
           <form action={cerrarSesion}>
             <button
               type="submit"
-              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-atilra-blanco/80 transition hover:bg-atilra-blanco/10 hover:text-atilra-blanco"
+              className="flex w-full items-center justify-center gap-2 rounded-lg border border-atilra-blanco/20 px-3 py-2 text-sm font-bold text-atilra-blanco transition hover:bg-atilra-blanco/10"
             >
-              <LogOut className="h-4 w-4" aria-hidden /> Cerrar sesión
+              <LockKeyhole className="h-4 w-4" aria-hidden /> Bloquear sesión
             </button>
           </form>
         </div>

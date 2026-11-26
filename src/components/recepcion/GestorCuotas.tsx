@@ -107,7 +107,7 @@ export function GestorCuotas({
   }
 
   return (
-    <div className="grid gap-5 xl:grid-cols-[minmax(280px,0.8fr)_minmax(0,1.4fr)]">
+    <div className="grid items-start gap-5 xl:grid-cols-[minmax(320px,0.85fr)_minmax(0,1.65fr)] 2xl:gap-6">
       <section className={cn(estilos.card, "space-y-4")}>
         <h2 className="text-lg font-bold text-atilra-carbon">Seleccionar usuario</h2>
         <div>
