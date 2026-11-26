@@ -23,8 +23,8 @@ export function PerfilBadge({ perfil }: { perfil: string }) {
       className={cn(
         "inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize",
         esAfiliado
-          ? "bg-atilra-verde-claro/25 text-atilra-carbon"
-          : "border border-atilra-gris/40 bg-atilra-blanco text-atilra-gris",
+          ? "bg-emerald-100 text-emerald-950"
+          : "border border-slate-300 bg-white text-slate-700",
       )}
     >
       {perfil}

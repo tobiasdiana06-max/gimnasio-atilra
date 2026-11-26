@@ -74,7 +74,7 @@ export function GestorPlanillaInscripcion({
 
       {errorCarga && <p role="alert" className="rounded-lg border border-semaforo-rojo bg-red-50 p-3 text-sm text-semaforo-rojo">{errorCarga}</p>}
       {planilla ? (
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-atilra-gris/20 bg-atilra-fondo p-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
           <div className="min-w-0">
             <p className="text-sm font-bold text-atilra-carbon">Planilla actual</p>
             <p className="truncate text-sm text-atilra-gris">{planilla.nombre}</p>
@@ -95,7 +95,7 @@ export function GestorPlanillaInscripcion({
           type="file"
           accept="application/pdf,image/jpeg,image/png,image/webp"
           required
-          className="block w-full rounded-lg border border-atilra-gris/40 bg-white p-2 text-sm text-atilra-gris file:mr-3 file:rounded-lg file:border-0 file:bg-atilra-verde file:px-4 file:py-2 file:font-semibold file:text-atilra-carbon"
+          className="block w-full rounded-xl border border-slate-300 bg-white p-2 text-sm text-slate-700 file:mr-3 file:rounded-lg file:border-0 file:bg-emerald-100 file:px-4 file:py-2 file:font-semibold file:text-emerald-950 hover:file:bg-emerald-200"
         />
         <p className="text-xs text-atilra-gris">Formatos PDF, JPG, PNG o WEBP · máximo {PLANILLA_INSCRIPCION_MAX_MB} MB.</p>
         <div className="flex flex-wrap gap-2">
@@ -110,7 +110,7 @@ export function GestorPlanillaInscripcion({
         </div>
       </form>
 
-      {mensaje && <p role="status" className="rounded-lg bg-atilra-verde/15 p-3 text-sm text-atilra-carbon">{mensaje}</p>}
+      {mensaje && <p role="status" className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-950">{mensaje}</p>}
       {error && <p role="alert" className="rounded-lg border border-semaforo-rojo bg-red-50 p-3 text-sm text-semaforo-rojo">{error}</p>}
     </section>
   );

@@ -68,7 +68,7 @@ export function UsuarioFormModal({ usuario, onCerrar }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-atilra-carbon/70 p-4"
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-atilra-carbon/80 p-4 sm:items-center"
       role="dialog"
       aria-modal="true"
       aria-label={usuario ? "Editar usuario" : "Nuevo usuario"}
@@ -78,7 +78,7 @@ export function UsuarioFormModal({ usuario, onCerrar }: Props) {
         onSubmit={enviar}
         noValidate
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-lg rounded-2xl bg-atilra-blanco p-6 shadow-xl"
+        className="my-4 max-h-[calc(100vh-2rem)] w-full max-w-lg overflow-y-auto rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl sm:my-0 sm:p-6"
       >
         <div className="mb-5 flex items-start justify-between gap-4">
           <h2 className="text-xl font-bold text-atilra-carbon">{usuario ? "Editar usuario" : "Nuevo usuario"}</h2>
@@ -100,7 +100,7 @@ export function UsuarioFormModal({ usuario, onCerrar }: Props) {
                   "rounded-lg border px-3 py-2 text-sm font-semibold transition",
                   valores.perfil === p.valor
                     ? "border-atilra-verde-oscuro bg-atilra-verde text-atilra-carbon"
-                    : "border-atilra-gris/40 text-atilra-gris hover:bg-atilra-fondo",
+                    : "border-slate-300 bg-white text-slate-700 hover:border-emerald-700 hover:bg-emerald-50",
                 )}
               >
                 {p.etiqueta}

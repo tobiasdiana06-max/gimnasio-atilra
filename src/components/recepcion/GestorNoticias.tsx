@@ -104,7 +104,7 @@ export function GestorNoticias({ noticias }: { noticias: Noticia[] }) {
             {editando && <button type="button" onClick={() => setEditando(null)} className={estilos.btnSecundario}>Cancelar edición</button>}
           </div>
         </form>
-        {mensaje && <p role="status" className="rounded-lg bg-atilra-verde/15 p-3 text-sm text-atilra-carbon">{mensaje}</p>}
+        {mensaje && <p role="status" className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-950">{mensaje}</p>}
         {error && <p role="alert" className="rounded-lg border border-semaforo-rojo bg-red-50 p-3 text-sm text-semaforo-rojo">{error}</p>}
       </section>
 
@@ -112,22 +112,22 @@ export function GestorNoticias({ noticias }: { noticias: Noticia[] }) {
         <h2 className="text-lg font-bold text-atilra-carbon">Cartelera ({noticias.length})</h2>
         {noticias.length === 0 && <div className={cn(estilos.card, "text-sm text-atilra-gris")}>Todavía no hay noticias. Creá la primera desde el formulario.</div>}
         {noticias.map((noticia) => (
-          <article key={noticia.id} className={cn(estilos.card, "space-y-3", !noticia.publicada && "opacity-75")}>
+          <article key={noticia.id} className={cn(estilos.card, "space-y-3", !noticia.publicada && "border-dashed")}>
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div className="flex items-start gap-2">
                 <Newspaper className="mt-1 h-5 w-5 shrink-0 text-atilra-verde-oscuro" aria-hidden />
                 <div>
-                  <h3 className="font-bold text-atilra-carbon">{noticia.titulo}</h3>
+                  <h3 className="break-words font-bold text-atilra-carbon">{noticia.titulo}</h3>
                   <p className="text-xs text-atilra-gris">Publicación: {formatearFechaHora(noticia.fecha_publicacion)}</p>
                 </div>
               </div>
-              <span className={cn("rounded-full px-3 py-1 text-xs font-bold", noticia.publicada ? "bg-atilra-verde/20 text-atilra-carbon" : "bg-atilra-gris/15 text-atilra-gris")}>
+              <span className={cn("rounded-full px-3 py-1 text-xs font-bold", noticia.publicada ? "bg-emerald-100 text-emerald-950" : "bg-slate-100 text-slate-700")}>
                 {noticia.publicada ? "Publicada" : "Oculta"}
               </span>
             </div>
-            <p className="whitespace-pre-wrap text-sm text-atilra-carbon">{noticia.contenido}</p>
+            <p className="break-words whitespace-pre-wrap text-sm text-atilra-carbon">{noticia.contenido}</p>
             {noticia.imagen_url && <a href={noticia.imagen_url} target="_blank" rel="noreferrer" className="text-sm font-semibold text-atilra-verde-oscuro underline">Ver imagen</a>}
-            <div className="flex flex-wrap gap-2 border-t border-atilra-gris/15 pt-3">
+            <div className="flex flex-wrap gap-2 border-t border-slate-200 pt-3">
               <button type="button" onClick={() => { setEditando(noticia); setMensaje(""); setError(""); }} className={estilos.btnSecundario}>
                 <Pencil className="h-4 w-4" aria-hidden /> Editar
               </button>

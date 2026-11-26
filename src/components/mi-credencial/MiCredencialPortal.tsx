@@ -104,7 +104,7 @@ function AccesoDni({ planillaUrl, planillaError }: { planillaUrl: string | null;
         <section className="flex flex-col justify-between gap-8 rounded-3xl bg-[#1e2421] p-6 text-white shadow-xl sm:p-8 lg:col-span-6">
           <div>
             <div className="flex items-center gap-4">
-              <span className="rounded-2xl bg-white/10 p-2.5">
+              <span className="rounded-2xl bg-[#29312d] p-2.5">
                 <LogoAtilra className="h-12 w-12" />
               </span>
               <div>
@@ -122,7 +122,7 @@ function AccesoDni({ planillaUrl, planillaError }: { planillaUrl: string | null;
           </div>
 
           <div className="space-y-3">
-            <article className="flex gap-3 rounded-2xl border border-white/10 bg-white/5 p-4">
+            <article className="flex gap-3 rounded-2xl border border-white/10 bg-[#29312d] p-4">
               <Clock3 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-300" aria-hidden />
               <div>
                 <h2 className="text-sm font-bold text-white">Horarios y sede</h2>
@@ -130,14 +130,14 @@ function AccesoDni({ planillaUrl, planillaError }: { planillaUrl: string | null;
                 <p className="mt-1 inline-flex items-center gap-1 text-xs text-white/55"><MapPin className="h-3.5 w-3.5" aria-hidden /> Gimnasio ATILRA</p>
               </div>
             </article>
-            <article className="flex gap-3 rounded-2xl border border-white/10 bg-white/5 p-4">
+            <article className="flex gap-3 rounded-2xl border border-white/10 bg-[#29312d] p-4">
               <FileCheck2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-300" aria-hidden />
               <div>
                 <h2 className="text-sm font-bold text-white">Documentación y acceso</h2>
                 <p className="mt-1 text-sm leading-relaxed text-white/70">Presentá tu certificado de apto médico vigente y validá tu ingreso con huella o credencial digital.</p>
               </div>
             </article>
-            <article className="flex gap-3 rounded-2xl border border-white/10 bg-white/5 p-4">
+            <article className="flex gap-3 rounded-2xl border border-white/10 bg-[#29312d] p-4">
               <Smartphone className="mt-0.5 h-5 w-5 shrink-0 text-emerald-300" aria-hidden />
               <div>
                 <h2 className="text-sm font-bold text-white">App en tu celular</h2>
@@ -155,7 +155,7 @@ function AccesoDni({ planillaUrl, planillaError }: { planillaUrl: string | null;
           </div>
 
           <div className="mb-6 grid gap-3 sm:grid-cols-2">
-            <div className="rounded-xl border border-emerald-200 bg-emerald-50/70 p-3">
+            <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-3">
               <p className="flex items-center gap-2 text-sm font-bold text-slate-900">
                 <Users className="h-4 w-4 text-emerald-700" aria-hidden /> Afiliado
               </p>
@@ -189,7 +189,7 @@ function AccesoDni({ planillaUrl, planillaError }: { planillaUrl: string | null;
             <button
               type="submit"
               disabled={ocupado}
-              className="inline-flex w-full items-center justify-center rounded-xl bg-[#047857] px-4 py-3.5 font-semibold text-white shadow-md transition-colors hover:bg-[#065f46] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex w-full items-center justify-center rounded-xl bg-[#047857] px-4 py-3.5 font-semibold text-white shadow-md transition-colors hover:bg-[#065f46] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 disabled:cursor-not-allowed disabled:bg-emerald-900 disabled:text-white"
             >
               {ocupado ? "Verificando…" : "Ingresar a mi credencial"}
             </button>
@@ -228,7 +228,7 @@ function TarjetaSemaforo({ estado }: { estado: EstadoUsuario | null }) {
           <ShieldAlert className="mt-0.5 h-5 w-5 shrink-0 text-[#606062]" aria-hidden />
         )}
         <div className="min-w-0">
-          <p className="text-xs font-bold uppercase tracking-wider opacity-70">Estado de acceso</p>
+          <p className="text-xs font-bold uppercase tracking-wider">Estado de acceso</p>
           <h3 className="mt-1 text-lg font-black leading-tight">{visual?.label ?? "ESTADO NO DISPONIBLE"}</h3>
           <p className="mt-2 text-sm font-medium leading-relaxed">
             {estado?.motivo ?? "Consultá en recepción para verificar tu estado."}
@@ -434,7 +434,7 @@ function Credencial({
               // eslint-disable-next-line @next/next/no-img-element
               <img src={usuario.foto_url} alt="" referrerPolicy="no-referrer" className="h-20 w-20 shrink-0 rounded-2xl object-cover ring-2 ring-white/20" />
             ) : (
-              <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-white/10">
+              <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-[#29312d]">
                 <UserRound className="h-10 w-10 text-emerald-300" aria-hidden />
               </div>
             )}
@@ -446,7 +446,7 @@ function Credencial({
           </div>
           <div className="mt-4 flex flex-wrap items-center gap-2">
             <PerfilBadge perfil={usuario.perfil} />
-            {esAfiliado && <span className="rounded-full bg-emerald-400/20 px-2.5 py-1 text-xs font-bold text-emerald-100">CCT 02/88</span>}
+            {esAfiliado && <span className="rounded-full border border-emerald-700 bg-emerald-900 px-2.5 py-1 text-xs font-bold text-emerald-100">CCT 02/88</span>}
             {esAfiliado && usuario.numero_legajo && (
               <span className="rounded-full border border-white/20 px-3 py-1 text-xs font-semibold text-white/80">
                 Legajo {usuario.numero_legajo}
@@ -552,7 +552,7 @@ function SubirAlta() {
   return (
     <section className="mx-auto w-full max-w-3xl space-y-5 rounded-3xl bg-white p-6 shadow-lg">
       <div className="flex items-center gap-3">
-        <div className="rounded-xl bg-[#9AC201]/20 p-3"><FileUp className="h-6 w-6 text-[#7EA100]" aria-hidden /></div>
+        <div className="rounded-xl bg-emerald-100 p-3"><FileUp className="h-6 w-6 text-emerald-800" aria-hidden /></div>
         <div>
           <h2 className="text-lg font-bold text-[#292929]">Subir alta médica</h2>
           <p className="text-sm text-[#606062]">Sacá una foto del certificado o adjuntá una imagen/PDF.</p>
@@ -583,7 +583,7 @@ function SubirAlta() {
         </div>
         {archivoNombre && <p className="text-sm text-[#606062]">Seleccionado: {archivoNombre}</p>}
         <p className="text-xs text-[#606062]">Formatos JPG, PNG, WEBP o PDF · máximo 10 MB. El archivo queda pendiente de revisión.</p>
-        {mensaje && <p role="status" className="rounded-lg bg-atilra-verde/15 p-3 text-sm text-atilra-carbon">{mensaje}</p>}
+        {mensaje && <p role="status" className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-950">{mensaje}</p>}
         {error && <p role="alert" className="rounded-lg border border-semaforo-rojo bg-red-50 p-3 text-sm text-semaforo-rojo">{error}</p>}
         <button type="submit" disabled={ocupado || !archivoNombre} className={cn(estilos.btnPrimario, "w-full py-3")}>
           {ocupado ? "Enviando…" : "Enviar certificado"}
@@ -610,7 +610,7 @@ function Cartelera({ noticias }: { noticias: NoticiaPortal[] }) {
             // eslint-disable-next-line @next/next/no-img-element
             <img src={noticia.imagen_url} alt="" loading="lazy" referrerPolicy="no-referrer" className="max-h-64 w-full rounded-xl object-cover" />
           )}
-          <p className="whitespace-pre-wrap text-sm leading-relaxed text-[#292929]">{noticia.contenido}</p>
+          <p className="break-words whitespace-pre-wrap text-sm leading-relaxed text-[#292929]">{noticia.contenido}</p>
         </article>
       ))}
     </section>
@@ -651,10 +651,10 @@ export function MiCredencialPortal({
 
   return (
     <div className="min-h-screen w-full overflow-x-hidden bg-gradient-to-br from-slate-100 via-emerald-50/40 to-slate-200/70">
-      <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col border-x border-white/60 bg-white/30 pb-24 shadow-2xl lg:border-x-0 lg:pb-8 lg:shadow-xl">
+      <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col border-x border-slate-200 bg-white pb-24 shadow-2xl lg:border-x-0 lg:pb-8 lg:shadow-xl">
         <header className="sticky top-0 z-30 flex items-center justify-between gap-3 bg-[#1e2421] px-4 py-3 text-white shadow-md sm:px-6 lg:px-8">
           <div className="flex min-w-0 items-center gap-3">
-            <span className="rounded-xl bg-white/10 p-1.5">
+            <span className="rounded-xl bg-[#29312d] p-1.5">
               <LogoAtilra className="h-9 w-9 shrink-0" />
             </span>
             <div className="min-w-0">

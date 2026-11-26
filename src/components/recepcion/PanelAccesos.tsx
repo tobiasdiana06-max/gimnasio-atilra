@@ -167,14 +167,14 @@ export function PanelAccesos({ usuarios, dniInicial }: { usuarios: UsuarioAcceso
           </div>
         </div>
         {errorLista && <p role="alert" className="rounded-lg border border-semaforo-rojo bg-red-50 p-3 text-sm text-semaforo-rojo">{errorLista}</p>}
-        <div className="overflow-x-auto rounded-xl border border-atilra-gris/15">
+        <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
           <table className="w-full min-w-[850px] text-left text-sm">
             <thead className="bg-atilra-carbon text-atilra-blanco">
               <tr><th className="p-3">Fecha y hora</th><th className="p-3">Usuario</th><th className="p-3">DNI / legajo</th><th className="p-3">Perfil</th><th className="p-3">Semáforo</th><th className="p-3">Motivo</th><th className="p-3">Método</th></tr>
             </thead>
             <tbody>
               {accesos.map((acceso) => (
-                <tr key={acceso.id} className="border-t border-atilra-gris/15 align-top">
+                <tr key={acceso.id} className="border-t border-slate-200 align-top">
                   <td className="whitespace-nowrap p-3">{formatearFechaHora(acceso.fecha_hora)}</td>
                   <td className="p-3 font-medium">{acceso.usuario ? `${acceso.usuario.apellido}, ${acceso.usuario.nombre}` : "Usuario eliminado"}</td>
                   <td className="p-3 font-mono">{acceso.usuario ? `${acceso.usuario.dni}${acceso.usuario.numero_legajo ? ` / ${acceso.usuario.numero_legajo}` : ""}` : "—"}</td>

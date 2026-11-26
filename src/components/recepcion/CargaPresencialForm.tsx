@@ -73,7 +73,7 @@ export function CargaPresencialForm({ usuarioId }: { usuarioId: string }) {
           name="archivo"
           type="file"
           accept="image/jpeg,image/png,image/webp,application/pdf"
-          className="block w-full text-sm text-atilra-gris file:mr-3 file:rounded-lg file:border-0 file:bg-atilra-verde-claro/30 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-atilra-carbon hover:file:bg-atilra-verde-claro/50"
+          className="block w-full rounded-xl border border-slate-300 bg-white p-2 text-sm text-slate-700 file:mr-3 file:rounded-lg file:border-0 file:bg-emerald-100 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-emerald-950 hover:file:bg-emerald-200"
         />
         <p className="mt-1 text-xs text-atilra-gris">
           JPG, PNG, WEBP o PDF, hasta {ALTA_MEDICA_MAX_MB} MB. Si lo dejás vacío, se registra la carga física sin adjunto.
@@ -84,7 +84,7 @@ export function CargaPresencialForm({ usuarioId }: { usuarioId: string }) {
         <p
           className={
             mensaje.tipo === "ok"
-              ? "rounded-lg border border-atilra-verde bg-atilra-verde/15 p-2 text-sm text-atilra-carbon"
+              ? "rounded-lg border border-emerald-200 bg-emerald-50 p-2 text-sm text-emerald-950"
               : "rounded-lg border border-semaforo-rojo bg-red-50 p-2 text-sm text-semaforo-rojo"
           }
         >
@@ -126,10 +126,10 @@ export function SimularEnvioDigitalForm({ usuarioId }: { usuarioId: string }) {
         type="file"
         required
         accept="image/jpeg,image/png,image/webp,application/pdf"
-        className="block w-full text-sm text-atilra-gris file:mr-3 file:rounded-lg file:border-0 file:bg-atilra-fondo file:px-3 file:py-2 file:text-sm file:font-semibold file:text-atilra-carbon"
+        className="block w-full rounded-xl border border-slate-300 bg-white p-2 text-sm text-slate-700 file:mr-3 file:rounded-lg file:border-0 file:bg-slate-100 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-slate-800 hover:file:bg-slate-200"
       />
       {mensaje && (
-        <p className={mensaje.tipo === "ok" ? "text-sm text-atilra-carbon" : "text-sm text-semaforo-rojo"}>
+        <p className={mensaje.tipo === "ok" ? "rounded-lg border border-emerald-200 bg-emerald-50 p-2 text-sm text-emerald-950" : "rounded-lg border border-red-200 bg-red-50 p-2 text-sm text-red-800"}>
           {mensaje.texto}
         </p>
       )}

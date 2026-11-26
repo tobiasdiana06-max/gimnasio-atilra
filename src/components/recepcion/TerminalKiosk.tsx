@@ -155,7 +155,7 @@ export function TerminalKiosk() {
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={fichada.usuario.foto_url} alt="" referrerPolicy="no-referrer" className="mb-5 h-28 w-28 rounded-full border-4 border-atilra-blanco object-cover shadow-xl sm:h-36 sm:w-36" />
               ) : (
-                <div className="mb-5 flex h-28 w-28 items-center justify-center rounded-full border-4 border-atilra-blanco bg-atilra-carbon/10 sm:h-36 sm:w-36">
+                <div className="mb-5 flex h-28 w-28 items-center justify-center rounded-full border-4 border-atilra-blanco bg-slate-200 sm:h-36 sm:w-36">
                   <UserRound className="h-16 w-16 text-atilra-carbon" aria-hidden />
                 </div>
               )}
@@ -186,10 +186,10 @@ export function TerminalKiosk() {
               </p>
             </div>
           ) : errorFichada ? (
-            <div className="flex min-h-[460px] flex-col items-center justify-center rounded-3xl border-4 border-semaforo-rojo bg-semaforo-rojo/10 p-8 text-center">
-              <ShieldAlert className="h-20 w-20 text-semaforo-rojo" aria-hidden />
+            <div className="flex min-h-[460px] flex-col items-center justify-center rounded-3xl border-4 border-red-400 bg-red-950 p-8 text-center">
+              <ShieldAlert className="h-20 w-20 text-red-300" aria-hidden />
               <h2 className="mt-5 text-3xl font-black text-atilra-blanco">No se pudo validar el ingreso</h2>
-              <p className="mt-3 max-w-2xl text-xl text-atilra-blanco">{errorFichada}</p>
+              <p className="mt-3 max-w-2xl break-words text-xl text-red-50">{errorFichada}</p>
             </div>
           ) : (
             <div className="flex min-h-[460px] flex-col items-center justify-center rounded-3xl border-2 border-dashed border-atilra-blanco/25 p-8 text-center">
@@ -201,12 +201,12 @@ export function TerminalKiosk() {
         </section>
 
         <aside className="space-y-5">
-          <section className="rounded-2xl border border-atilra-blanco/15 bg-atilra-blanco/5 p-5">
+          <section className="rounded-2xl border border-white/15 bg-[#303a34] p-5">
             <div className="mb-4 flex items-center gap-2">
               <Radio className="h-5 w-5 text-atilra-verde" aria-hidden />
               <h2 className="text-lg font-bold">Ingreso de respaldo por DNI</h2>
             </div>
-            <p className="mb-4 text-sm text-atilra-blanco/70">Usalo si la huella está gastada o la persona todavía no fue enrolada.</p>
+            <p className="mb-4 text-sm text-white/80">Usalo si la huella está gastada o la persona todavía no fue enrolada.</p>
             <form onSubmit={(event) => void ingresoDni(event)} className="space-y-3">
               <label htmlFor="terminal-dni" className="text-xs font-semibold uppercase tracking-wide text-atilra-blanco/70">DNI</label>
               <input id="terminal-dni" value={dni} onChange={(event) => setDni(event.target.value)} inputMode="numeric"
@@ -217,10 +217,10 @@ export function TerminalKiosk() {
             </form>
           </section>
 
-          <section className="rounded-2xl border border-atilra-blanco/15 bg-atilra-blanco/5 p-5">
+          <section className="rounded-2xl border border-white/15 bg-[#303a34] p-5">
             <h2 className="font-bold">Estado de conexión</h2>
-            <p className="mt-2 text-sm text-atilra-blanco/70">{puente ? modoSimulador ? "Modo simulador de consola activo." : puente.readerConnected ? "El puente informa que el lector está conectado." : "El puente está activo, pero no detecta un lector USB." : "Iniciá bridge-huella en esta PC para recibir lecturas biométricas."}</p>
-            <p className="mt-3 text-xs text-atilra-blanco/50">La validación de DNI manual funciona aunque el puente local no esté disponible.</p>
+            <p className="mt-2 text-sm text-white/80">{puente ? modoSimulador ? "Modo simulador de consola activo." : puente.readerConnected ? "El puente informa que el lector está conectado." : "El puente está activo, pero no detecta un lector USB." : "Iniciá bridge-huella en esta PC para recibir lecturas biométricas."}</p>
+            <p className="mt-3 text-xs text-white/70">La validación de DNI manual funciona aunque el puente local no esté disponible.</p>
           </section>
         </aside>
       </div>

@@ -36,17 +36,17 @@ export const SEMAFORO_CLASES: Record<
   verde: {
     badge: "bg-atilra-verde text-atilra-carbon",
     etiqueta: "Habilitado",
-    panel: "border-atilra-verde bg-atilra-verde/15",
+    panel: "border-atilra-verde bg-emerald-50",
   },
   amarillo: {
     badge: "bg-semaforo-amarillo text-atilra-carbon",
     etiqueta: "Alerta preventiva",
-    panel: "border-semaforo-amarillo bg-semaforo-amarillo/15",
+    panel: "border-semaforo-amarillo bg-amber-50",
   },
   rojo: {
     badge: "bg-semaforo-rojo text-white",
     etiqueta: "Acceso retenido",
-    panel: "border-semaforo-rojo bg-semaforo-rojo/10",
+    panel: "border-semaforo-rojo bg-red-50",
   },
 };
 

@@ -123,7 +123,7 @@ export function PadronUsuarios({ filas }: { filas: FilaPadron[] }) {
                   "rounded-full border px-3 py-1 text-sm font-semibold transition",
                   perfil === p.valor
                     ? "border-atilra-carbon bg-atilra-carbon text-atilra-blanco"
-                    : "border-atilra-gris/40 text-atilra-gris hover:bg-atilra-fondo",
+                    : "border-slate-300 bg-white text-slate-700 hover:border-emerald-700 hover:bg-emerald-50",
                 )}
               >
                 {p.etiqueta}
@@ -147,7 +147,7 @@ export function PadronUsuarios({ filas }: { filas: FilaPadron[] }) {
                     ? s.valor === "todos"
                       ? "border-atilra-carbon bg-atilra-carbon text-atilra-blanco"
                       : cn("border-transparent", SEMAFORO_CLASES[s.valor].badge)
-                    : "border-atilra-gris/40 text-atilra-gris hover:bg-atilra-fondo",
+                    : "border-slate-300 bg-white text-slate-700 hover:border-emerald-700 hover:bg-emerald-50",
                 )}
               >
                 {s.etiqueta} ({s.cantidad})
@@ -157,7 +157,7 @@ export function PadronUsuarios({ filas }: { filas: FilaPadron[] }) {
         </div>
       </div>
 
-      <div className="overflow-x-auto rounded-2xl border border-atilra-gris/15 bg-atilra-blanco shadow-sm">
+      <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
         <table className="w-full min-w-[1000px] text-left text-sm">
           <thead className="bg-atilra-carbon text-atilra-blanco">
             <tr>
@@ -173,7 +173,7 @@ export function PadronUsuarios({ filas }: { filas: FilaPadron[] }) {
           </thead>
           <tbody>
             {visibles.map((f) => (
-              <tr key={f.usuario_id} className="border-t border-atilra-gris/15 hover:bg-atilra-fondo/70">
+              <tr key={f.usuario_id} className="border-t border-slate-200 hover:bg-slate-50">
                   <td className="whitespace-nowrap p-3 font-mono">{f.dni}</td>
                   <td className="whitespace-nowrap p-3">{f.numero_legajo ?? "—"}</td>
                 <td className="p-3 font-medium text-atilra-carbon">

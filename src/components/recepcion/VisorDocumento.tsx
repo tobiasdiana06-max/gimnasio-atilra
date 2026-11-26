@@ -34,11 +34,11 @@ export function VisorDocumento({ docId, etiqueta = "Ver archivo" }: { docId: str
           onClick={() => setAbierto(false)}
         >
           <div
-            className="max-h-[90vh] w-full max-w-3xl overflow-auto rounded-2xl bg-atilra-blanco p-5 shadow-xl"
+            className="max-h-[90vh] w-full max-w-3xl overflow-auto rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-4 flex items-start justify-between gap-4">
-              <h3 className="text-lg font-bold text-atilra-carbon">{urls.nombre ?? "Alta médica"}</h3>
+              <h3 className="min-w-0 break-words text-lg font-bold text-atilra-carbon">{urls.nombre ?? "Alta médica"}</h3>
               <button
                 type="button"
                 onClick={() => setAbierto(false)}
@@ -60,7 +60,7 @@ export function VisorDocumento({ docId, etiqueta = "Ver archivo" }: { docId: str
                   <img
                     src={urls.urlVer}
                     alt="Alta médica enviada"
-                    className="mx-auto max-h-[60vh] rounded-lg border border-atilra-gris/20 object-contain"
+                    className="mx-auto max-h-[60vh] max-w-full rounded-lg border border-atilra-gris/20 object-contain"
                   />
                 ) : (
                   <p className="rounded-lg bg-atilra-fondo p-4 text-sm text-atilra-gris">

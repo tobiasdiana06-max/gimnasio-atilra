@@ -75,7 +75,7 @@ export default async function FichaUsuarioPage({ params }: { params: Promise<{ i
           </div>
           <BotonEditarUsuario usuario={usuarioEditable} />
         </div>
-        <div className="flex flex-wrap gap-2 border-t border-atilra-gris/15 pt-4">
+        <div className="flex flex-wrap gap-2 border-t border-slate-200 pt-4">
           <Link href={`/recepcion/cuotas?usuario=${u.id}`} className={estilos.btnSecundario}>
             <CreditCard className="h-4 w-4" aria-hidden />
             {u.perfil === "invitado" ? "Registrar / ver cuotas" : "Renovar afiliación"}
@@ -135,7 +135,7 @@ export default async function FichaUsuarioPage({ params }: { params: Promise<{ i
           {documentos.map((d) => {
             const visible = estadoVisible(d, hoy);
             return (
-              <li key={d.id} className="rounded-xl border border-atilra-gris/20 p-4">
+              <li key={d.id} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="space-y-1">
                     <span className={cn("inline-flex rounded-full px-3 py-1 text-xs font-bold", visible.clase)}>
@@ -158,7 +158,7 @@ export default async function FichaUsuarioPage({ params }: { params: Promise<{ i
                 </div>
 
                 {d.estado === "pendiente" && (
-                  <div className="mt-4 border-t border-atilra-gris/15 pt-4">
+                  <div className="mt-4 border-t border-slate-200 pt-4">
                     <ValidarAltaForm docId={d.id} />
                   </div>
                 )}
@@ -169,7 +169,7 @@ export default async function FichaUsuarioPage({ params }: { params: Promise<{ i
       </section>
 
       {esDesarrollo && (
-        <section className="rounded-2xl border border-dashed border-atilra-gris/50 p-5">
+        <section className="rounded-2xl border border-dashed border-slate-300 bg-white p-5 shadow-sm">
           <h2 className="text-sm font-bold uppercase tracking-wide text-atilra-gris">Solo desarrollo</h2>
           <p className="mb-3 text-sm text-atilra-gris">
             Simula el envío por chat/WhatsApp de la Etapa 3: el archivo queda «pendiente» para probar la bandeja.

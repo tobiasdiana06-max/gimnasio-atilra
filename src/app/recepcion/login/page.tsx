@@ -15,7 +15,7 @@ export default async function LoginRecepcionPage() {
         <section className="flex flex-col justify-between gap-10 rounded-3xl border border-white/10 bg-[#1e2421] p-6 text-white shadow-2xl sm:p-8 lg:col-span-6 lg:p-10">
           <div>
             <header className="flex items-center gap-4">
-              <span className="rounded-2xl bg-white/10 p-2.5">
+              <span className="rounded-2xl bg-[#29312d] p-2.5">
                 <LogoAtilra className="h-12 w-12 shrink-0" />
               </span>
               <div>
@@ -34,7 +34,7 @@ export default async function LoginRecepcionPage() {
               { icon: FileCheck2, label: "Gestión de cuotas y aptos médicos" },
               { icon: ClipboardCheck, label: "Exportación de reportes" },
             ].map(({ icon: Icon, label }) => (
-              <li key={label} className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm font-medium text-white/90">
+              <li key={label} className="flex items-center gap-3 rounded-2xl border border-white/10 bg-[#29312d] p-4 text-sm font-medium text-white/90">
                 <Icon className="h-5 w-5 shrink-0 text-emerald-300" aria-hidden />
                 {label}
               </li>

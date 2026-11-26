@@ -72,7 +72,7 @@ export function RecepcionNav({ email, pendientes }: Props) {
       <div className="mx-auto max-w-[1440px] px-3 sm:px-5 lg:px-8">
         <div className="flex items-center justify-between gap-3 border-b border-white/10 py-3">
           <div className="flex min-w-0 items-center gap-3">
-            <span className="rounded-xl bg-white/10 p-1.5">
+            <span className="rounded-xl bg-[#29312d] p-1.5">
               <LogoAtilra className="h-9 w-9 shrink-0" />
             </span>
             <div className="min-w-0">
@@ -113,7 +113,7 @@ export function RecepcionNav({ email, pendientes }: Props) {
             <form action={cerrarSesion}>
               <button
                 type="submit"
-                className="inline-flex items-center gap-2 whitespace-nowrap rounded-xl border border-emerald-300/40 bg-emerald-500/10 px-3 py-2 text-sm font-bold text-white transition hover:bg-emerald-500/20"
+                className="inline-flex items-center gap-2 whitespace-nowrap rounded-xl border border-emerald-700 bg-emerald-900 px-3 py-2 text-sm font-bold text-white transition hover:bg-emerald-800"
               >
                 <LockKeyhole className="h-4 w-4" aria-hidden /> Bloquear sesión
               </button>
@@ -125,7 +125,7 @@ export function RecepcionNav({ email, pendientes }: Props) {
           <form action={cerrarSesion}>
             <button
               type="submit"
-              className="flex w-full items-center justify-center gap-2 rounded-xl border border-emerald-300/40 bg-emerald-500/10 px-3 py-2 text-sm font-bold text-white transition hover:bg-emerald-500/20"
+              className="flex w-full items-center justify-center gap-2 rounded-xl border border-emerald-700 bg-emerald-900 px-3 py-2 text-sm font-bold text-white transition hover:bg-emerald-800"
             >
               <LockKeyhole className="h-4 w-4" aria-hidden /> Bloquear sesión
             </button>

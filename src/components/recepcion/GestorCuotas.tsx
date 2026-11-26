@@ -212,7 +212,7 @@ export function GestorCuotas({
             <button type="button" disabled={ocupado} onClick={() => renovar()} className={estilos.btnPrimario}>
               Renovar por un año
             </button>
-            <div className="flex flex-wrap items-end gap-3 border-t border-atilra-gris/15 pt-4">
+            <div className="flex flex-wrap items-end gap-3 border-t border-slate-200 pt-4">
               <div>
                 <label htmlFor="fecha-renovacion" className={estilos.label}>Fecha personalizada</label>
                 <input id="fecha-renovacion" type="date" min={hoy} value={fechaPersonalizada}
@@ -226,7 +226,7 @@ export function GestorCuotas({
           </section>
         )}
 
-        {mensaje && <p role="status" className="rounded-lg border border-atilra-verde-oscuro/40 bg-atilra-verde/15 p-3 text-sm text-atilra-carbon">{mensaje}</p>}
+        {mensaje && <p role="status" className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-950">{mensaje}</p>}
         {error && <p role="alert" className="rounded-lg border border-semaforo-rojo bg-red-50 p-3 text-sm text-semaforo-rojo">{error}</p>}
 
         {usuario?.perfil === "invitado" && (
@@ -238,14 +238,14 @@ export function GestorCuotas({
               </button>
             </div>
             {cargandoHistorial ? <p className="text-sm text-atilra-gris">Cargando historial…</p> : pagosUsuario.length === 0 ? <p className="text-sm text-atilra-gris">Este invitado todavía no tiene pagos registrados.</p> : (
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
                 <table className="w-full min-w-[600px] text-left text-sm">
                   <thead className="bg-atilra-carbon text-atilra-blanco">
                     <tr><th className="p-3">Período</th><th className="p-3">Monto</th><th className="p-3">Medio</th><th className="p-3">Pago</th><th className="p-3">Vencimiento</th><th className="p-3">Observaciones</th></tr>
                   </thead>
                   <tbody>
                     {pagosUsuario.map((p) => (
-                      <tr key={p.id} className="border-t border-atilra-gris/15">
+                      <tr key={p.id} className="border-t border-slate-200">
                         <td className="p-3">{p.periodo}</td>
                         <td className="p-3">{Number(p.monto).toLocaleString("es-AR", { style: "currency", currency: "ARS" })}</td>
                         <td className="p-3 capitalize">{p.medio_pago}</td>

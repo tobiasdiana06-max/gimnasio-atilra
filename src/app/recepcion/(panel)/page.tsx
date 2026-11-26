@@ -82,7 +82,7 @@ export default async function PadronPage() {
       href: "/recepcion#padron",
       enlace: "Abrir padrón",
       Icono: Users,
-      iconoClase: "bg-atilra-verde/20 text-atilra-verde-oscuro",
+      iconoClase: "bg-emerald-100 text-emerald-900",
     },
     {
       titulo: "Ingresos de hoy",
