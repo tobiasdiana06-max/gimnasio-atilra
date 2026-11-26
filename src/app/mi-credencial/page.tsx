@@ -1,5 +1,7 @@
 import { MiCredencialPortal, type NoticiaPortal, type UsuarioMiCredencial } from "@/components/mi-credencial/MiCredencialPortal";
 import { obtenerUsuarioCredencialId } from "@/lib/auth/credencial";
+import { hoyISO } from "@/lib/fechas";
+import { obtenerPlanillaPublicada } from "@/lib/planilla-inscripcion";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { EstadoUsuario } from "@/types";
 
@@ -7,8 +9,25 @@ export const dynamic = "force-dynamic";
 
 export default async function MiCredencialPage() {
   const usuarioId = await obtenerUsuarioCredencialId();
+  let planillaUrl: string | null = null;
+  let planillaError: string | undefined;
+  try {
+    planillaUrl = (await obtenerPlanillaPublicada())?.url ?? null;
+  } catch {
+    planillaError = "No se pudo consultar la planilla de inscripción.";
+  }
+
   if (!usuarioId) {
-    return <MiCredencialPortal usuario={null} estado={null} noticias={[]} />;
+    return (
+      <MiCredencialPortal
+        usuario={null}
+        estado={null}
+        noticias={[]}
+        hoy={hoyISO()}
+        planillaUrl={planillaUrl}
+        planillaError={planillaError}
+      />
+    );
   }
 
   const supabase = createAdminClient();
@@ -37,6 +56,10 @@ export default async function MiCredencialPage() {
         avisarTelefonoInvitado={usuario?.perfil === "invitado" && !usuario.telefono?.trim()}
         estado={(estadoRes.data ?? null) as EstadoUsuario | null}
         noticias={(noticiasRes.data ?? []) as NoticiaPortal[]}
+        hoy={hoyISO()}
+        planillaUrl={planillaUrl}
+        planillaError={planillaError}
+        claveVapidPublica={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? ""}
         errorCarga={errorCarga ? `No se pudieron cargar todos los datos: ${errorCarga}` : undefined}
       />
     </div>

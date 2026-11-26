@@ -1,4 +1,6 @@
 import { createHash, timingSafeEqual } from "node:crypto";
+import * as webpush from "web-push";
+import type { PushSubscription } from "web-push";
 import { HITOS_RECORDATORIO } from "@/lib/constants";
 import { esFechaISO, hoyISO } from "@/lib/fechas";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -27,6 +29,87 @@ interface Recordatorio {
   tipo: TipoVencimiento;
   hitoDias: number;
   fechaReferencia: string;
+}
+
+interface SuscripcionPush {
+  endpoint: string;
+  subscription: PushSubscription;
+}
+
+function suscripcionPushValida(valor: unknown): valor is PushSubscription {
+  if (!valor || typeof valor !== "object") return false;
+  const suscripcion = valor as Record<string, unknown>;
+  if (typeof suscripcion.endpoint !== "string" || !suscripcion.endpoint.startsWith("https://")) return false;
+  if (!suscripcion.keys || typeof suscripcion.keys !== "object") return false;
+  const keys = suscripcion.keys as Record<string, unknown>;
+  return typeof keys.p256dh === "string" && typeof keys.auth === "string";
+}
+
+async function enviarPushVencimiento(
+  supabase: ReturnType<typeof createAdminClient>,
+  recordatorio: Recordatorio,
+): Promise<{ enviados: number; error: string | null }> {
+  const { data: registro, error: errorRegistro } = await supabase
+    .from("push_notificaciones_enviadas")
+    .select("enviado_at")
+    .eq("usuario_id", recordatorio.usuario.usuario_id)
+    .eq("tipo", recordatorio.tipo)
+    .eq("hito_dias", recordatorio.hitoDias)
+    .eq("fecha_referencia", recordatorio.fechaReferencia)
+    .maybeSingle();
+  if (errorRegistro) return { enviados: 0, error: "No se pudo consultar el estado del aviso push." };
+  if (registro?.enviado_at) return { enviados: 0, error: null };
+
+  const { data: filas, error: errorSuscripciones } = await supabase
+    .from("push_subscriptions")
+    .select("endpoint, subscription")
+    .eq("usuario_id", recordatorio.usuario.usuario_id);
+  if (errorSuscripciones) return { enviados: 0, error: "No se pudieron consultar los dispositivos suscritos." };
+
+  const suscripciones = (filas ?? []).filter((fila): fila is SuscripcionPush =>
+    typeof fila.endpoint === "string" && suscripcionPushValida(fila.subscription),
+  );
+  if (suscripciones.length === 0) return { enviados: 0, error: null };
+
+  const payload = JSON.stringify({
+    title: "Recordatorio de vencimiento",
+    body: "Tenés un vencimiento próximo. Ingresá a Mi Credencial para ver los detalles.",
+  });
+
+  let enviados = 0;
+  let fallidos = false;
+  for (const fila of suscripciones) {
+    try {
+      await webpush.sendNotification(fila.subscription, payload);
+      enviados += 1;
+    } catch (error) {
+      fallidos = true;
+      const statusCode = typeof error === "object" && error !== null && "statusCode" in error
+        ? error.statusCode
+        : null;
+      if (statusCode === 404 || statusCode === 410) {
+        await supabase
+          .from("push_subscriptions")
+          .delete()
+          .eq("usuario_id", recordatorio.usuario.usuario_id)
+          .eq("endpoint", fila.endpoint);
+      }
+    }
+  }
+
+  if (fallidos) return { enviados, error: "No se pudieron entregar todos los avisos push." };
+  const { error: errorActualizacion } = await supabase
+    .from("push_notificaciones_enviadas")
+    .insert({
+      usuario_id: recordatorio.usuario.usuario_id,
+      tipo: recordatorio.tipo,
+      hito_dias: recordatorio.hitoDias,
+      fecha_referencia: recordatorio.fechaReferencia,
+    });
+  if (errorActualizacion && errorActualizacion.code !== "23505") {
+    return { enviados, error: "No se pudo registrar la entrega de los avisos push." };
+  }
+  return { enviados, error: null };
 }
 
 function autorizado(authorization: string | null, secret: string): boolean {
@@ -144,14 +227,28 @@ export async function POST(request: Request) {
   }
 
   const recordatorios = recordatoriosDe(estados, hoyISO());
-  const resumen = { revisados: estados.length, encontrados: recordatorios.length, enviados: 0, simulados: 0, duplicados: 0, sinTelefono: 0, errores: 0 };
+  const vapidPublica = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY?.trim() ?? "";
+  const vapidPrivada = process.env.VAPID_PRIVATE_KEY?.trim() ?? "";
+  const vapidSubject = process.env.VAPID_SUBJECT?.trim() ?? "";
+  const pushConfigurado = Boolean(vapidPublica && vapidPrivada && vapidSubject);
+  const resumen = { revisados: estados.length, encontrados: recordatorios.length, enviados: 0, push_enviados: 0, push_configurado: pushConfigurado, simulados: 0, duplicados: 0, sinTelefono: 0, errores: 0 };
   const detallesError: Array<{ tipo: TipoVencimiento; hito_dias: number; error: string }> = [];
   const supabase = createAdminClient();
 
+  if (pushConfigurado) {
+    try {
+      webpush.setVapidDetails(vapidSubject, vapidPublica, vapidPrivada);
+    } catch {
+      console.error("Cron de vencimientos: la configuración VAPID no es válida.");
+      return responder({ ok: false, error: "La configuración de notificaciones push no es válida." }, 500);
+    }
+  }
+
   for (const recordatorio of recordatorios) {
-    if (webhookUrl && !recordatorio.usuario.telefono?.trim()) {
+    const sinTelefono = Boolean(webhookUrl && !recordatorio.usuario.telefono?.trim());
+    if (sinTelefono) {
       resumen.sinTelefono += 1;
-      continue;
+      if (!pushConfigurado || recordatorio.tipo === "afiliacion") continue;
     }
 
     const { data: registro, error: errorRegistro } = await supabase
@@ -160,13 +257,30 @@ export async function POST(request: Request) {
         usuario_id: recordatorio.usuario.usuario_id,
         tipo: recordatorio.tipo,
         hito_dias: recordatorio.hitoDias,
-        canal: webhookUrl ? "whatsapp" : "simulacion",
+        canal: webhookUrl && !sinTelefono ? "whatsapp" : "simulacion",
         fecha_referencia: recordatorio.fechaReferencia,
       })
       .select("id")
       .maybeSingle();
 
     let registroId = registro?.id as string | undefined;
+    if (
+      pushConfigurado
+      && recordatorio.tipo !== "afiliacion"
+      && (!errorRegistro || errorRegistro.code === "23505")
+    ) {
+      const resultadoPush = await enviarPushVencimiento(supabase, recordatorio);
+      resumen.push_enviados += resultadoPush.enviados;
+      if (resultadoPush.error) {
+        resumen.errores += 1;
+        detallesError.push({
+          tipo: recordatorio.tipo,
+          hito_dias: recordatorio.hitoDias,
+          error: resultadoPush.error,
+        });
+      }
+    }
+
     if (errorRegistro?.code === "23505") {
       if (webhookUrl) {
         const { data: anterior, error: errorAnterior } = await supabase
@@ -230,6 +344,7 @@ export async function POST(request: Request) {
       });
       continue;
     }
+    if (sinTelefono) continue;
 
     if (!webhookUrl) {
       resumen.simulados += 1;

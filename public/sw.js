@@ -17,6 +17,37 @@ self.addEventListener("activate", (event) => {
   })());
 });
 
+self.addEventListener("push", (event) => {
+  let payload = {};
+  try {
+    payload = event.data?.json() ?? {};
+  } catch {
+    payload = { body: event.data?.text() ?? "" };
+  }
+
+  event.waitUntil(self.registration.showNotification(payload.title || "Mi Atilra", {
+    body: payload.body || "Tenés un aviso sobre el vencimiento de tu credencial.",
+    icon: "/icons/atilra-192.png",
+    badge: "/icons/atilra-192.png",
+    data: { url: "/mi-credencial" },
+  }));
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  event.waitUntil((async () => {
+    const pagina = new URL("/mi-credencial", self.location.origin).href;
+    const clientes = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+    for (const cliente of clientes) {
+      if (cliente.url.startsWith(self.location.origin) && "focus" in cliente) {
+        await cliente.navigate(pagina);
+        return cliente.focus();
+      }
+    }
+    return self.clients.openWindow(pagina);
+  })());
+});
+
 self.addEventListener("fetch", (event) => {
   const request = event.request;
   const url = new URL(request.url);

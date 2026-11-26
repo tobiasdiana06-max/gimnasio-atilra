@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FileCheck2, Fingerprint, LockKeyhole, LogOut, Newspaper, TicketCheck, Users, ClipboardList } from "lucide-react";
+import { FileCheck2, Fingerprint, LockKeyhole, LogOut, Newspaper, TicketCheck, Users, ClipboardList, FileDown } from "lucide-react";
 import { cerrarSesion } from "@/app/recepcion/actions/sesion";
 import { LogoAtilra } from "@/components/ui/LogoAtilra";
 import { cn } from "@/lib/utils";
@@ -42,6 +42,13 @@ export function RecepcionNav({ email, pendientes }: Props) {
       etiqueta: "Noticias",
       icono: Newspaper,
       activo: pathname.startsWith("/recepcion/noticias"),
+      badge: 0,
+    },
+    {
+      href: "/recepcion/planilla-inscripcion",
+      etiqueta: "Planilla",
+      icono: FileDown,
+      activo: pathname.startsWith("/recepcion/planilla-inscripcion"),
       badge: 0,
     },
     {

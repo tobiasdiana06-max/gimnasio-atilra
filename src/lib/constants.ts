@@ -8,6 +8,9 @@ export const HITOS_RECORDATORIO = [15, 3, 0] as const;
 export const ZONA_HORARIA = "America/Argentina/Buenos_Aires";
 
 export const BUCKET_ALTAS_MEDICAS = "altas-medicas";
+export const BUCKET_PLANILLA_INSCRIPCION = "planilla-inscripcion";
+export const PLANILLA_INSCRIPCION_MAX_MB = 10;
+export const PLANILLA_INSCRIPCION_MAX_BYTES = PLANILLA_INSCRIPCION_MAX_MB * 1024 * 1024;
 
 /** Vigencia por defecto de un alta médica al validarla (editable en recepción). */
 export const VIGENCIA_ALTA_MEDICA_ANIOS = 1;

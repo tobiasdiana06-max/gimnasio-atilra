@@ -1,14 +1,14 @@
 "use client";
 
-import { useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { BadgeCheck, CalendarDays, FileUp, Fingerprint, LogOut, Newspaper, ShieldAlert, UserRound } from "lucide-react";
+import { BadgeCheck, Bell, CalendarDays, Download, FileUp, Fingerprint, LogOut, Newspaper, ShieldAlert, UserRound } from "lucide-react";
 import { iniciarSesionCredencial, salirCredencial, subirAltaMedicaSocio } from "@/app/mi-credencial/actions";
 import { PerfilBadge } from "@/components/recepcion/SemaforoBadge";
 import { estilos } from "@/components/recepcion/estilos";
 import { LogoAtilra } from "@/components/ui/LogoAtilra";
 import { CONTACTO } from "@/lib/constants";
-import { formatearFecha, formatearFechaHora } from "@/lib/fechas";
+import { esFechaISO, formatearFecha, formatearFechaHora } from "@/lib/fechas";
 import { cn } from "@/lib/utils";
 import type { EstadoUsuario } from "@/types";
 
@@ -159,7 +159,187 @@ function TarjetaSemaforo({ estado }: { estado: EstadoUsuario | null }) {
   );
 }
 
-function Credencial({ usuario, estado }: { usuario: UsuarioMiCredencial; estado: EstadoUsuario | null }) {
+function diasRestantes(fecha: string | null | undefined, hoy: string): number | null {
+  const fechaISO = fecha?.slice(0, 10);
+  if (!fechaISO || !esFechaISO(fechaISO) || !esFechaISO(hoy)) return null;
+  const [anio, mes, dia] = fechaISO.split("-").map(Number);
+  const [anioHoy, mesHoy, diaHoy] = hoy.split("-").map(Number);
+  return (Date.UTC(anio, mes - 1, dia) - Date.UTC(anioHoy, mesHoy - 1, diaHoy)) / 86_400_000;
+}
+
+function AlertaVencimientos({
+  usuario,
+  estado,
+  hoy,
+}: {
+  usuario: UsuarioMiCredencial;
+  estado: EstadoUsuario | null;
+  hoy: string;
+}) {
+  const vencimientos = [
+    { nombre: "Apto médico", fecha: estado?.alta_vencimiento },
+    ...(usuario.perfil === "invitado" ? [{ nombre: "Cuota mensual", fecha: estado?.cuota_vencimiento }] : []),
+  ].flatMap(({ nombre, fecha }) => {
+    const dias = diasRestantes(fecha, hoy);
+    const fechaISO = fecha?.slice(0, 10);
+    return dias !== null && dias <= 7 && fechaISO ? [{ nombre, fecha: fechaISO, dias }] : [];
+  });
+
+  if (vencimientos.length === 0) return null;
+  const hayVencido = vencimientos.some(({ dias }) => dias < 0);
+
+  return (
+    <aside
+      role="status"
+      aria-live="polite"
+      className={cn(
+        "mt-4 rounded-2xl border p-4",
+        hayVencido ? "border-red-300 bg-red-50 text-red-900" : "border-amber-300 bg-amber-50 text-amber-950",
+      )}
+    >
+      <h3 className="font-black">{hayVencido ? "Revisá tus vencimientos" : "Vencimiento próximo"}</h3>
+      <ul className="mt-2 space-y-2 text-sm">
+        {vencimientos.map(({ nombre, fecha, dias }) => (
+          <li key={nombre}>
+            <span className="font-bold">{nombre}:</span>{" "}
+            {dias < 0
+              ? `vencido el ${formatearFecha(fecha)} (hace ${Math.abs(dias)} ${Math.abs(dias) === 1 ? "día" : "días"}).`
+              : dias === 0
+                ? `vence hoy, ${formatearFecha(fecha)}.`
+                : `vence el ${formatearFecha(fecha)} (faltan ${dias} ${dias === 1 ? "día" : "días"}).`}
+          </li>
+        ))}
+      </ul>
+    </aside>
+  );
+}
+
+function clavePublicaBytes(clave: string): Uint8Array {
+  const padding = "=".repeat((4 - (clave.length % 4)) % 4);
+  const base64 = (clave + padding).replace(/-/g, "+").replace(/_/g, "/");
+  return Uint8Array.from(window.atob(base64), (caracter) => caracter.charCodeAt(0));
+}
+
+function NotificacionesPush({ clavePublica }: { clavePublica: string }) {
+  const [soportado, setSoportado] = useState(false);
+  const [activa, setActiva] = useState(false);
+  const [ocupado, setOcupado] = useState(false);
+  const [mensaje, setMensaje] = useState("");
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let vigente = true;
+    if (!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)) {
+      return;
+    }
+
+    void navigator.serviceWorker.ready
+      .then((registration) => {
+        if (vigente) setSoportado(true);
+        return registration.pushManager.getSubscription();
+      })
+      .then((subscription) => {
+        if (vigente) setActiva(Boolean(subscription));
+      })
+      .catch(() => {
+        if (vigente) setError("No se pudo consultar la suscripción de este dispositivo.");
+      });
+
+    return () => { vigente = false; };
+  }, []);
+
+  async function cambiarSuscripcion() {
+    setMensaje("");
+    setError("");
+    setOcupado(true);
+    try {
+      const registration = await navigator.serviceWorker.ready;
+      const subscription = await registration.pushManager.getSubscription();
+      if (subscription) {
+        const respuesta = await fetch("/api/mi-credencial/push-subscription", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ endpoint: subscription.endpoint }),
+        });
+        if (!respuesta.ok) throw new Error("No se pudo desactivar la suscripción en el servidor.");
+        await subscription.unsubscribe();
+        setActiva(false);
+        setMensaje("Las notificaciones de vencimiento quedaron desactivadas en este dispositivo.");
+        return;
+      }
+
+      if (!clavePublica) throw new Error("Las notificaciones push todavía no están configuradas.");
+      const permiso = await Notification.requestPermission();
+      if (permiso !== "granted") throw new Error("Necesitás permitir las notificaciones para activar los avisos.");
+
+      const nuevaSuscripcion = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: clavePublicaBytes(clavePublica).buffer as ArrayBuffer,
+      });
+      const respuesta = await fetch("/api/mi-credencial/push-subscription", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ subscription: nuevaSuscripcion.toJSON() }),
+      });
+      if (!respuesta.ok) {
+        await nuevaSuscripcion.unsubscribe();
+        const resultado = await respuesta.json() as { error?: string };
+        throw new Error(resultado.error ?? "No se pudo guardar la suscripción.");
+      }
+      setActiva(true);
+      setMensaje("Este celular recibirá avisos de vencimiento.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "No se pudo actualizar la suscripción.");
+    } finally {
+      setOcupado(false);
+    }
+  }
+
+  return (
+    <section className="mt-4 rounded-2xl border border-slate-200 bg-white p-4">
+      <div className="flex items-start gap-3">
+        <Bell className="mt-0.5 h-5 w-5 shrink-0 text-[#7EA100]" aria-hidden />
+        <div className="min-w-0 flex-1">
+          <h3 className="font-bold text-[#292929]">Avisos en este celular</h3>
+          <p className="mt-1 text-sm text-[#606062]">Recibí notificaciones de vencimiento aunque no tengas Mi Credencial abierta.</p>
+        </div>
+      </div>
+      {soportado ? (
+        <button type="button" disabled={ocupado} onClick={() => void cambiarSuscripcion()} className={cn(estilos.btnSecundario, "mt-3 w-full")}>
+          <Bell className="h-4 w-4" aria-hidden />
+          {ocupado ? "Actualizando…" : activa ? "Desactivar notificaciones en este celular" : "Recibir notificaciones de vencimiento en este celular"}
+        </button>
+      ) : (
+        <p className="mt-3 text-sm text-[#606062]">Este navegador no admite notificaciones push.</p>
+      )}
+      {mensaje && <p role="status" className="mt-3 text-sm text-green-800">{mensaje}</p>}
+      {error && <p role="alert" className="mt-3 text-sm text-red-800">{error}</p>}
+    </section>
+  );
+}
+
+function BotonPlanilla({ url }: { url: string | null }) {
+  if (!url) return null;
+  return (
+    <a href={url} download className={cn(estilos.btnPrimario, "mt-4 w-full py-3")}>
+      <Download className="h-4 w-4" aria-hidden /> Descargar planilla de inscripción
+    </a>
+  );
+}
+
+function Credencial({
+  usuario,
+  estado,
+  hoy,
+  planillaUrl,
+  claveVapidPublica,
+}: {
+  usuario: UsuarioMiCredencial;
+  estado: EstadoUsuario | null;
+  hoy: string;
+  planillaUrl: string | null;
+  claveVapidPublica: string;
+}) {
   const esAfiliado = usuario.perfil === "afiliado";
   return (
     <div className="space-y-4">
@@ -199,6 +379,9 @@ function Credencial({ usuario, estado }: { usuario: UsuarioMiCredencial; estado:
             )}
           </div>
           <TarjetaSemaforo estado={estado} />
+          <AlertaVencimientos usuario={usuario} estado={estado} hoy={hoy} />
+          <NotificacionesPush clavePublica={claveVapidPublica} />
+          <BotonPlanilla url={planillaUrl} />
 
           <div className="mt-5 grid grid-cols-2 gap-3">
             <div className="min-w-0 rounded-2xl border border-slate-100 bg-[#F4F6F4] p-3.5">
@@ -327,16 +510,32 @@ export function MiCredencialPortal({
   avisarTelefonoInvitado = false,
   estado,
   noticias,
+  hoy,
+  planillaUrl = null,
+  planillaError,
+  claveVapidPublica = "",
   errorCarga,
 }: {
   usuario: UsuarioMiCredencial | null;
   avisarTelefonoInvitado?: boolean;
   estado: EstadoUsuario | null;
   noticias: NoticiaPortal[];
+  hoy: string;
+  planillaUrl?: string | null;
+  planillaError?: string;
+  claveVapidPublica?: string;
   errorCarga?: string;
 }) {
   const [seccion, setSeccion] = useState<Seccion>("credencial");
-  if (!usuario) return <AccesoDni />;
+  if (!usuario) {
+    return (
+      <>
+        <AccesoDni />
+        {planillaError && <p role="alert" className="mx-auto mt-4 max-w-md px-5 text-sm text-red-800">{planillaError}</p>}
+        <div className="mx-auto max-w-md px-5"><BotonPlanilla url={planillaUrl} /></div>
+      </>
+    );
+  }
 
   const tabs: { id: Seccion; label: string; icon: typeof BadgeCheck }[] = [
     { id: "credencial", label: "Mi Credencial", icon: BadgeCheck },
@@ -369,7 +568,16 @@ export function MiCredencialPortal({
           </aside>
         )}
         {errorCarga && <p role="alert" className="mb-4 rounded-2xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">{errorCarga}</p>}
-        {seccion === "credencial" && <Credencial usuario={usuario} estado={estado} />}
+        {planillaError && <p role="alert" className="mb-4 rounded-2xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">{planillaError}</p>}
+        {seccion === "credencial" && (
+          <Credencial
+            usuario={usuario}
+            estado={estado}
+            hoy={hoy}
+            planillaUrl={planillaUrl}
+            claveVapidPublica={claveVapidPublica}
+          />
+        )}
         {seccion === "alta" && <SubirAlta />}
         {seccion === "noticias" && <Cartelera noticias={noticias} />}
         <PrivacidadDatos />
