@@ -6,6 +6,7 @@ import { BadgeCheck, CalendarDays, FileUp, Fingerprint, LogOut, Newspaper, Shiel
 import { iniciarSesionCredencial, salirCredencial, subirAltaMedicaSocio } from "@/app/mi-credencial/actions";
 import { PerfilBadge } from "@/components/recepcion/SemaforoBadge";
 import { estilos } from "@/components/recepcion/estilos";
+import { LogoAtilra } from "@/components/ui/LogoAtilra";
 import { formatearFecha, formatearFechaHora } from "@/lib/fechas";
 import { cn } from "@/lib/utils";
 import type { EstadoUsuario } from "@/types";
@@ -58,7 +59,7 @@ function AccesoDni() {
     <main className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center border-x border-slate-200 bg-[#F4F6F4] px-5 py-8 shadow-2xl">
       <header className="sticky top-0 mb-6 rounded-3xl border-b-4 border-[#9AC201] bg-[#292929] p-6 text-white shadow-lg">
         <div className="flex items-center gap-3">
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#9AC201] text-lg font-black text-[#292929]" aria-hidden>A</span>
+          <LogoAtilra className="h-11 w-11 shrink-0" />
           <div>
             <p className="text-sm font-bold">Gimnasio ATILRA</p>
             <p className="text-xs text-white/70">Seccional General Rodríguez (CCT 02/88)</p>
@@ -312,7 +313,7 @@ export function MiCredencialPortal({
     <div className="mx-auto flex min-h-screen w-full max-w-md flex-col border-x border-slate-200 bg-[#F4F6F4] pb-24 shadow-2xl">
       <header className="sticky top-0 z-30 flex items-center justify-between gap-3 bg-[#292929] px-4 py-3 text-white shadow-md">
         <div className="flex min-w-0 items-center gap-3">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#9AC201] text-base font-black text-[#292929]" aria-hidden>A</span>
+          <LogoAtilra className="h-10 w-10 shrink-0" />
           <div className="min-w-0">
             <p className="text-sm font-bold leading-tight">Gimnasio ATILRA</p>
             <p className="mt-0.5 text-[11px] leading-tight text-white/70">Seccional General Rodríguez (CCT 02/88)</p>

@@ -5,6 +5,7 @@ import { Fingerprint, Radio, ShieldAlert, UserRound } from "lucide-react";
 import { ficharDniManual } from "@/app/recepcion/actions/terminal";
 import { SemaforoBadge } from "@/components/recepcion/SemaforoBadge";
 import { estilos } from "@/components/recepcion/estilos";
+import { LogoAtilra } from "@/components/ui/LogoAtilra";
 import { SEMAFORO_CLASES } from "@/lib/constants";
 import { formatearFechaHora } from "@/lib/fechas";
 import { cn } from "@/lib/utils";
@@ -124,9 +125,12 @@ export function TerminalKiosk() {
   return (
     <main className="min-h-[calc(100vh-3rem)] rounded-3xl bg-atilra-carbon p-4 text-atilra-blanco sm:p-6 xl:p-8">
       <header className="mb-6 flex flex-wrap items-center justify-between gap-4 border-b border-atilra-blanco/15 pb-5">
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-atilra-verde-claro">Gimnasio ATILRA · General Rodríguez</p>
-          <h1 className="mt-1 text-2xl font-black sm:text-3xl">Terminal de ingreso</h1>
+        <div className="flex items-center gap-3">
+          <LogoAtilra className="h-12 w-12 shrink-0" />
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-atilra-verde-claro">Gimnasio ATILRA · General Rodríguez</p>
+            <h1 className="mt-1 text-2xl font-black sm:text-3xl">Terminal de ingreso</h1>
+          </div>
         </div>
         <div className="text-right">
           <p className="text-xl font-bold tabular-nums sm:text-2xl">{hora || "—"}</p>

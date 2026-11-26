@@ -13,20 +13,21 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Gimnasio ATILRA General Rodríguez",
+  applicationName: "Mi Atilra",
+  title: "Mi Atilra",
   description: "Credencial digital del Gimnasio ATILRA.",
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Mi Credencial ATILRA",
+    title: "Mi Atilra",
   },
   icons: {
     icon: [
       { url: "/icons/atilra-192.png", sizes: "192x192", type: "image/png" },
       { url: "/icons/atilra-512.png", sizes: "512x512", type: "image/png" },
     ],
-    apple: "/icons/atilra-192.png",
+    apple: "/apple-touch-icon.png",
   },
 };
 

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FileCheck2, Fingerprint, LogOut, Newspaper, TicketCheck, Users, ClipboardList } from "lucide-react";
 import { cerrarSesion } from "@/app/recepcion/actions/sesion";
+import { LogoAtilra } from "@/components/ui/LogoAtilra";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -62,8 +63,13 @@ export function RecepcionNav({ email, pendientes }: Props) {
   return (
     <aside className="bg-atilra-carbon text-atilra-blanco md:sticky md:top-0 md:flex md:h-screen md:w-64 md:shrink-0 md:flex-col">
       <div className="border-b-4 border-atilra-verde px-5 py-4">
-        <p className="text-xs text-atilra-blanco/60">ATILRA · Gral. Rodríguez</p>
-        <p className="text-lg font-bold">Gimnasio — Recepción</p>
+        <div className="flex items-center gap-3">
+          <LogoAtilra className="h-10 w-10 shrink-0" />
+          <div>
+            <p className="text-xs text-atilra-blanco/60">ATILRA · Gral. Rodríguez</p>
+            <p className="text-lg font-bold">Gimnasio — Recepción</p>
+          </div>
+        </div>
       </div>
 
       <nav className="flex gap-1 overflow-x-auto p-3 md:flex-1 md:flex-col md:overflow-visible">
