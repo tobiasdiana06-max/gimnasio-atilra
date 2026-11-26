@@ -35,7 +35,11 @@ export function LoginForm() {
         <p className="rounded-lg border border-semaforo-rojo bg-red-50 p-3 text-sm text-semaforo-rojo">{estado.error}</p>
       )}
 
-      <button type="submit" disabled={pendiente} className={`${estilos.btnPrimario} w-full`}>
+      <button
+        type="submit"
+        disabled={pendiente}
+        className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#047857] px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#065f46] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#10b981] disabled:cursor-not-allowed disabled:opacity-60"
+      >
         {pendiente ? "Ingresando…" : "Ingresar"}
       </button>
     </form>
