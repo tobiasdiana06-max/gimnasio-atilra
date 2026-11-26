@@ -1,11 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Search, ShieldCheck, UserRoundCheck } from "lucide-react";
+import { Download, Search, ShieldCheck, UserRoundCheck } from "lucide-react";
 import { consultarAccesoPorDni, consultarAccesoPorUsuario, simularFichada, type ResultadoEstadoAcceso } from "@/app/recepcion/actions/accesos";
 import { PerfilBadge, SemaforoBadge } from "@/components/recepcion/SemaforoBadge";
 import { estilos } from "@/components/recepcion/estilos";
 import { formatearFechaHora } from "@/lib/fechas";
+import { descargarCSV } from "@/lib/csv";
 import { SEMAFORO_CLASES } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import type { SemaforoAcceso } from "@/types";
@@ -134,6 +135,20 @@ export function PanelAccesos({ usuarios, dniInicial }: { usuarios: UsuarioAcceso
     await cargarAccesos();
   }
 
+  function exportarAccesos() {
+    descargarCSV(
+      "bitacora-asistencias.csv",
+      ["Fecha y hora", "Persona", "Perfil", "Resultado", "Método"],
+      accesos.map((acceso) => [
+        formatearFechaHora(acceso.fecha_hora),
+        acceso.usuario ? `${acceso.usuario.apellido}, ${acceso.usuario.nombre}` : "Usuario eliminado",
+        acceso.usuario?.perfil ?? "",
+        acceso.semaforo,
+        acceso.metodo,
+      ]),
+    );
+  }
+
   return (
     <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1.65fr)_minmax(360px,0.9fr)] 2xl:gap-6">
       <section className={cn(estilos.card, "space-y-4")}>
@@ -141,6 +156,9 @@ export function PanelAccesos({ usuarios, dniInicial }: { usuarios: UsuarioAcceso
           <div>
             <h2 className="text-lg font-bold text-atilra-carbon">Últimas fichadas</h2>
             <p className="text-xs text-atilra-gris">Actualización automática cada 5 segundos · máximo 200 resultados.</p>
+            <button type="button" onClick={exportarAccesos} disabled={accesos.length === 0} title="Exporta los resultados filtrados (máximo 200)" className={cn(estilos.btnSecundario, "mt-2")}>
+              <Download className="h-4 w-4" aria-hidden /> Exportar CSV
+            </button>
           </div>
           <div className="grid gap-2 sm:grid-cols-3">
             <div><label htmlFor="acceso-desde" className={estilos.label}>Desde</label><input id="acceso-desde" type="date" value={desde} onChange={(e) => setDesde(e.target.value)} className={estilos.input} /></div>

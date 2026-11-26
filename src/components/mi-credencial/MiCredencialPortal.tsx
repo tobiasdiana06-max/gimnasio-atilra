@@ -547,7 +547,7 @@ export function MiCredencialPortal({
   ];
 
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col border-x border-slate-200 bg-[#F4F6F4] pb-24 shadow-2xl lg:border-x-0 lg:pb-8 lg:shadow-xl">
+    <div className="mx-auto flex min-h-screen w-full max-w-5xl flex-col border-x border-slate-200 bg-[#F4F6F4] pb-24 shadow-2xl lg:border-x-0 lg:pb-8 lg:shadow-xl">
       <header className="sticky top-0 z-30 flex items-center justify-between gap-3 bg-[#292929] px-4 py-3 text-white shadow-md">
         <div className="flex min-w-0 items-center gap-3">
           <LogoAtilra className="h-10 w-10 shrink-0" />
@@ -563,7 +563,7 @@ export function MiCredencialPortal({
         </form>
       </header>
 
-      <main className="mx-auto w-full max-w-5xl flex-1 px-4 pb-8 pt-5 sm:px-6 lg:px-8 lg:pt-8">
+      <main className="mx-auto w-full max-w-3xl flex-1 px-4 pb-8 pt-5 sm:px-6 lg:px-8 lg:pt-8">
         {avisarTelefonoInvitado && usuario.perfil === "invitado" && (
           <aside role="status" className="mb-4 rounded-2xl border border-[#9AC201]/50 bg-[#9AC201]/15 p-4 text-sm text-[#292929]">
             <p className="font-bold">Agregá un teléfono para proteger tu credencial</p>
@@ -589,7 +589,7 @@ export function MiCredencialPortal({
         </footer>
       </main>
 
-      <nav aria-label="Secciones de mi credencial" className="fixed bottom-0 left-1/2 z-40 grid w-full max-w-6xl -translate-x-1/2 grid-cols-3 gap-1 border-x border-t border-white/10 bg-[#292929] px-2 pb-3 pt-2 shadow-2xl lg:bottom-5 lg:w-fit lg:grid-cols-[repeat(3,minmax(150px,1fr))] lg:rounded-2xl lg:border lg:pb-2">
+      <nav aria-label="Secciones de mi credencial" className="fixed bottom-0 left-1/2 z-40 grid w-full max-w-5xl -translate-x-1/2 grid-cols-3 gap-1 border-x border-t border-white/10 bg-[#292929] px-2 pb-3 pt-2 shadow-2xl lg:bottom-5 lg:w-fit lg:grid-cols-[repeat(3,minmax(150px,1fr))] lg:rounded-2xl lg:border lg:pb-2">
         {tabs.map(({ id, label, icon: Icon }) => (
           <button key={id} type="button" onClick={() => setSeccion(id)} aria-current={seccion === id ? "page" : undefined}
             className={cn("flex min-h-14 flex-col items-center justify-center gap-1 rounded-xl px-1 py-2 text-[11px] font-bold transition",

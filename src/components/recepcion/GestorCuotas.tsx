@@ -2,9 +2,10 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { CalendarClock, CircleDollarSign, Search } from "lucide-react";
+import { CalendarClock, CircleDollarSign, Download, Search } from "lucide-react";
 import { obtenerHistorialCuotas, registrarPagoCuota, renovarAfiliacion } from "@/app/recepcion/actions/cuotas";
 import { estilos } from "@/components/recepcion/estilos";
+import { descargarCSV } from "@/lib/csv";
 import { formatearFecha } from "@/lib/fechas";
 import { cn } from "@/lib/utils";
 
@@ -104,6 +105,21 @@ export function GestorCuotas({
     setMensaje(resultado.mensaje ?? "Afiliación renovada.");
     setFechaPersonalizada("");
     router.refresh();
+  }
+
+  function exportarPagos() {
+    descargarCSV(
+      "historial-pagos.csv",
+      ["Invitado", "Período", "Monto ARS", "Medio de pago", "Fecha de pago", "Vencimiento"],
+      pagosUsuario.map((p) => [
+        usuario ? `${usuario.apellido}, ${usuario.nombre}` : "",
+        p.periodo,
+        Number(p.monto).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+        p.medio_pago,
+        formatearFecha(p.fecha_pago),
+        formatearFecha(p.fecha_vencimiento),
+      ]),
+    );
   }
 
   return (
@@ -215,7 +231,12 @@ export function GestorCuotas({
 
         {usuario?.perfil === "invitado" && (
           <section className={cn(estilos.card, "space-y-3")}>
-            <h2 className="text-lg font-bold text-atilra-carbon">Historial de pagos</h2>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h2 className="text-lg font-bold text-atilra-carbon">Historial de pagos</h2>
+              <button type="button" onClick={exportarPagos} disabled={pagosUsuario.length === 0} className={estilos.btnSecundario}>
+                <Download className="h-4 w-4" aria-hidden /> Exportar CSV
+              </button>
+            </div>
             {cargandoHistorial ? <p className="text-sm text-atilra-gris">Cargando historial…</p> : pagosUsuario.length === 0 ? <p className="text-sm text-atilra-gris">Este invitado todavía no tiene pagos registrados.</p> : (
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[600px] text-left text-sm">

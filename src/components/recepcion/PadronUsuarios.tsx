@@ -83,7 +83,7 @@ export function PadronUsuarios({ filas }: { filas: FilaPadron[] }) {
   ];
 
   return (
-    <div className="space-y-5">
+    <div id="padron" className="space-y-5">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-atilra-carbon">Padrón de usuarios</h1>
