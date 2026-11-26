@@ -6,21 +6,20 @@ import { createAdminClient } from "@/lib/supabase/admin";
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
 
+function responder(body: unknown, status = 200): Response {
+  return Response.json(body, { status, headers: { "Cache-Control": "no-store" } });
+}
+
 type TipoVencimiento = "alta_medica" | "cuota" | "afiliacion";
 
 interface EstadoCron {
   usuario_id: string;
-  dni: string;
   nombre: string;
   apellido: string;
-  perfil: "afiliado" | "invitado";
   telefono: string | null;
-  activo: boolean;
   alta_vencimiento: string | null;
   cuota_vencimiento: string | null;
   afiliacion_vencimiento: string | null;
-  semaforo: "verde" | "amarillo" | "rojo";
-  motivo: string;
 }
 
 interface Recordatorio {
@@ -52,7 +51,7 @@ async function consultarEstados() {
   for (let desde = 0; ; desde += pagina) {
     const { data, error } = await supabase
       .from("vista_estado_usuarios")
-      .select("usuario_id, dni, nombre, apellido, perfil, telefono, activo, alta_vencimiento, cuota_vencimiento, afiliacion_vencimiento, semaforo, motivo")
+      .select("usuario_id, nombre, apellido, telefono, alta_vencimiento, cuota_vencimiento, afiliacion_vencimiento")
       .eq("activo", true)
       .range(desde, desde + pagina - 1);
     if (error) return { estados: null, error };
@@ -99,18 +98,13 @@ async function enviarWebhook(url: string, recordatorio: Recordatorio): Promise<s
         source: "gimnasio-atilra",
         to: recordatorio.usuario.telefono,
         usuario: {
-          id: recordatorio.usuario.usuario_id,
           nombre: recordatorio.usuario.nombre,
           apellido: recordatorio.usuario.apellido,
-          dni: recordatorio.usuario.dni,
-          perfil: recordatorio.usuario.perfil,
         },
         recordatorio: {
           tipo: recordatorio.tipo,
           hito_dias: recordatorio.hitoDias,
           fecha_referencia: recordatorio.fechaReferencia,
-          semaforo: recordatorio.usuario.semaforo,
-          motivo: recordatorio.usuario.motivo,
         },
       }),
       signal: AbortSignal.timeout(10_000),
@@ -124,9 +118,9 @@ async function enviarWebhook(url: string, recordatorio: Recordatorio): Promise<s
 
 export async function POST(request: Request) {
   const secret = process.env.CRON_SECRET;
-  if (!secret) return Response.json({ ok: false, error: "El endpoint cron no está configurado." }, { status: 503 });
+  if (!secret) return responder({ ok: false, error: "El endpoint cron no está configurado." }, 503);
   if (!autorizado(request.headers.get("authorization"), secret)) {
-    return Response.json({ ok: false, error: "No autorizado." }, { status: 401 });
+    return responder({ ok: false, error: "No autorizado." }, 401);
   }
 
   const webhookUrl = process.env.WHATSAPP_WEBHOOK_URL?.trim() || null;
@@ -136,22 +130,22 @@ export async function POST(request: Request) {
       const esHttpLocal = parsed.protocol === "http:" &&
         (parsed.hostname === "localhost" || parsed.hostname === "127.0.0.1");
       if (parsed.protocol !== "https:" && !esHttpLocal) {
-        return Response.json({ ok: false, error: "WHATSAPP_WEBHOOK_URL debe usar HTTPS." }, { status: 500 });
+        return responder({ ok: false, error: "WHATSAPP_WEBHOOK_URL debe usar HTTPS." }, 500);
       }
     } catch {
-      return Response.json({ ok: false, error: "WHATSAPP_WEBHOOK_URL no es una URL válida." }, { status: 500 });
+      return responder({ ok: false, error: "WHATSAPP_WEBHOOK_URL no es una URL válida." }, 500);
     }
   }
 
   const { estados, error } = await consultarEstados();
   if (error || !estados) {
     console.error("Cron de vencimientos: no se pudo consultar la vista de estado.", error?.message);
-    return Response.json({ ok: false, error: "No se pudo consultar el padrón para calcular vencimientos." }, { status: 500 });
+    return responder({ ok: false, error: "No se pudo consultar el padrón para calcular vencimientos." }, 500);
   }
 
   const recordatorios = recordatoriosDe(estados, hoyISO());
   const resumen = { revisados: estados.length, encontrados: recordatorios.length, enviados: 0, simulados: 0, duplicados: 0, sinTelefono: 0, errores: 0 };
-  const detallesError: Array<{ usuario_id: string; tipo: TipoVencimiento; hito_dias: number; error: string }> = [];
+  const detallesError: Array<{ tipo: TipoVencimiento; hito_dias: number; error: string }> = [];
   const supabase = createAdminClient();
 
   for (const recordatorio of recordatorios) {
@@ -186,7 +180,6 @@ export async function POST(request: Request) {
         if (errorAnterior) {
           resumen.errores += 1;
           detallesError.push({
-            usuario_id: recordatorio.usuario.usuario_id,
             tipo: recordatorio.tipo,
             hito_dias: recordatorio.hitoDias,
             error: "No se pudo verificar el registro previo del recordatorio.",
@@ -204,7 +197,6 @@ export async function POST(request: Request) {
           if (errorPromocion) {
             resumen.errores += 1;
             detallesError.push({
-              usuario_id: recordatorio.usuario.usuario_id,
               tipo: recordatorio.tipo,
               hito_dias: recordatorio.hitoDias,
               error: "No se pudo reservar el recordatorio simulado para el envío real.",
@@ -222,7 +214,6 @@ export async function POST(request: Request) {
     if (errorRegistro && errorRegistro.code !== "23505") {
       resumen.errores += 1;
       detallesError.push({
-        usuario_id: recordatorio.usuario.usuario_id,
         tipo: recordatorio.tipo,
         hito_dias: recordatorio.hitoDias,
         error: "No se pudo reservar el recordatorio en notificaciones_enviadas.",
@@ -233,7 +224,6 @@ export async function POST(request: Request) {
     if (!registroId) {
       resumen.errores += 1;
       detallesError.push({
-        usuario_id: recordatorio.usuario.usuario_id,
         tipo: recordatorio.tipo,
         hito_dias: recordatorio.hitoDias,
         error: "No se recibió el identificador de la reserva del recordatorio.",
@@ -244,7 +234,6 @@ export async function POST(request: Request) {
     if (!webhookUrl) {
       resumen.simulados += 1;
       console.info("[SIMULACIÓN WhatsApp]", JSON.stringify({
-        usuario_id: recordatorio.usuario.usuario_id,
         tipo: recordatorio.tipo,
         hito_dias: recordatorio.hitoDias,
         fecha_referencia: recordatorio.fechaReferencia,
@@ -261,7 +250,6 @@ export async function POST(request: Request) {
       if (errorReserva) console.error("Cron de vencimientos: no se pudo liberar la reserva fallida.", errorReserva.message);
       resumen.errores += 1;
       detallesError.push({
-        usuario_id: recordatorio.usuario.usuario_id,
         tipo: recordatorio.tipo,
         hito_dias: recordatorio.hitoDias,
         error: errorReserva ? `${errorWebhook} No se pudo liberar la reserva para reintentar.` : errorWebhook,
@@ -273,8 +261,5 @@ export async function POST(request: Request) {
   }
 
   const ok = resumen.errores === 0;
-  return Response.json(
-    { ok, ...resumen, errores_detalle: detallesError },
-    { status: ok ? 200 : 502, headers: { "Cache-Control": "no-store" } },
-  );
+  return responder({ ok, ...resumen, errores_detalle: detallesError }, ok ? 200 : 502);
 }

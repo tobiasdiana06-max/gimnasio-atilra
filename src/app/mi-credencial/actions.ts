@@ -3,7 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { guardarSesionCredencial, requerirUsuarioCredencialId, cerrarSesionCredencial } from "@/lib/auth/credencial";
-import { ALTA_MEDICA_EXTENSION_POR_MIME, ALTA_MEDICA_MAX_BYTES, ALTA_MEDICA_MAX_MB, BUCKET_ALTAS_MEDICAS } from "@/lib/constants";
+import { BUCKET_ALTAS_MEDICAS } from "@/lib/constants";
+import { asegurarBucketMedicoPrivado, validarArchivoMedico } from "@/lib/archivos-medicos";
 import { mensajeEsperaIntentos, reservarIntentoLogin } from "@/lib/auth/limite-intentos";
 import { normalizarDni } from "@/lib/validaciones";
 import type { ResultadoAccion } from "@/types/recepcion";
@@ -86,17 +87,17 @@ export async function subirAltaMedicaSocio(formData: FormData): Promise<Resultad
   const archivo = archivoFormulario(formData);
   if (!archivo) return { ok: false, error: "Elegí una foto o un PDF del certificado." };
 
-  const extension = ALTA_MEDICA_EXTENSION_POR_MIME[archivo.type];
-  if (!extension) return { ok: false, error: "El archivo debe ser JPG, PNG, WEBP o PDF." };
-  if (archivo.size > ALTA_MEDICA_MAX_BYTES) {
-    return { ok: false, error: `El archivo supera el máximo de ${ALTA_MEDICA_MAX_MB} MB.` };
-  }
+  const validacion = await validarArchivoMedico(archivo);
+  if (!validacion.ok) return { ok: false, error: validacion.error };
 
   const supabase = createAdminClient();
-  const path = `${usuarioId}/${crypto.randomUUID()}.${extension}`;
+  const errorBucket = await asegurarBucketMedicoPrivado(supabase);
+  if (errorBucket) return { ok: false, error: errorBucket };
+
+  const path = `${usuarioId}/${crypto.randomUUID()}.${validacion.extension}`;
   const { error: errorSubida } = await supabase.storage
     .from(BUCKET_ALTAS_MEDICAS)
-    .upload(path, Buffer.from(await archivo.arrayBuffer()), { contentType: archivo.type, upsert: false });
+    .upload(path, Buffer.from(await archivo.arrayBuffer()), { contentType: validacion.mime, upsert: false });
   if (errorSubida) return { ok: false, error: `No se pudo subir el certificado: ${errorSubida.message}` };
 
   const { error: errorRegistro } = await supabase.from("documentacion_medica").insert({
@@ -104,13 +105,13 @@ export async function subirAltaMedicaSocio(formData: FormData): Promise<Resultad
     estado: "pendiente",
     origen: "app",
     archivo_path: path,
-    archivo_nombre: archivo.name || `certificado.${extension}`,
+    archivo_nombre: `certificado.${validacion.extension}`,
   });
 
   if (errorRegistro) {
     const { error: errorLimpieza } = await supabase.storage.from(BUCKET_ALTAS_MEDICAS).remove([path]);
     const detalleLimpieza = errorLimpieza ? ` También falló la limpieza del archivo temporal: ${errorLimpieza.message}` : "";
-    return { ok: false, error: `No se pudo registrar el certificado: ${errorRegistro.message}.${detalleLimpieza}` };
+    return { ok: false, error: `No se pudo registrar el certificado.${detalleLimpieza}` };
   }
 
   revalidatePath("/mi-credencial");

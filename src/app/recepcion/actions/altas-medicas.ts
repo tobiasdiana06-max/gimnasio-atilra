@@ -4,34 +4,33 @@ import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { requireRecepcion } from "@/lib/auth/recepcion";
 import {
-  ALTA_MEDICA_EXTENSION_POR_MIME,
-  ALTA_MEDICA_MAX_BYTES,
-  ALTA_MEDICA_MAX_MB,
   BUCKET_ALTAS_MEDICAS,
 } from "@/lib/constants";
+import { asegurarBucketMedicoPrivado, validarArchivoMedico } from "@/lib/archivos-medicos";
 import { hoyISO } from "@/lib/fechas";
 import { validarFechasAlta } from "@/lib/validaciones";
 import type { ResultadoAccion, UrlsDocumento } from "@/types/recepcion";
 
 type Admin = ReturnType<typeof createAdminClient>;
 
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
 type ArchivoSubido = { ok: true; path: string; nombre: string } | { ok: false; error: string };
 
 async function subirArchivo(supabase: Admin, usuarioId: string, archivo: File): Promise<ArchivoSubido> {
-  const extension = ALTA_MEDICA_EXTENSION_POR_MIME[archivo.type];
-  if (!extension) return { ok: false, error: "El archivo tiene que ser una foto (JPG, PNG, WEBP) o un PDF." };
-  if (archivo.size > ALTA_MEDICA_MAX_BYTES) {
-    return { ok: false, error: `El archivo pesa demasiado (máximo ${ALTA_MEDICA_MAX_MB} MB).` };
-  }
+  const validacion = await validarArchivoMedico(archivo);
+  if (!validacion.ok) return validacion;
+  const errorBucket = await asegurarBucketMedicoPrivado(supabase);
+  if (errorBucket) return { ok: false, error: errorBucket };
 
-  const path = `${usuarioId}/${crypto.randomUUID()}.${extension}`;
+  const path = `${usuarioId}/${crypto.randomUUID()}.${validacion.extension}`;
   const contenido = Buffer.from(await archivo.arrayBuffer());
   const { error } = await supabase.storage
     .from(BUCKET_ALTAS_MEDICAS)
-    .upload(path, contenido, { contentType: archivo.type, upsert: false });
+    .upload(path, contenido, { contentType: validacion.mime, upsert: false });
 
   if (error) return { ok: false, error: `No se pudo subir el archivo: ${error.message}` };
-  return { ok: true, path, nombre: archivo.name || `alta-medica.${extension}` };
+  return { ok: true, path, nombre: `certificado.${validacion.extension}` };
 }
 
 function archivoDelFormulario(formData: FormData): File | null {
@@ -42,23 +41,39 @@ function archivoDelFormulario(formData: FormData): File | null {
 /** URLs firmadas (5 min) para ver/descargar un certificado del bucket privado. */
 export async function obtenerUrlsDocumento(docId: string): Promise<UrlsDocumento> {
   await requireRecepcion();
+  if (!UUID.test(docId)) return { ok: false, error: "No encontramos ese registro." };
+
   const supabase = createAdminClient();
 
   const { data, error } = await supabase
     .from("documentacion_medica")
-    .select("archivo_path, archivo_nombre")
+    .select("usuario_id, archivo_path")
     .eq("id", docId)
     .maybeSingle();
 
-  const doc = data as { archivo_path: string | null; archivo_nombre: string | null } | null;
+  const doc = data as { usuario_id: string; archivo_path: string | null } | null;
   if (error || !doc) return { ok: false, error: "No encontramos ese registro." };
   if (!doc.archivo_path) return { ok: false, error: "Este registro no tiene archivo adjunto." };
+
+  const archivo = doc.archivo_path.match(/^([0-9a-f-]{36})\/([0-9a-f-]{36})\.(jpg|png|webp|pdf)$/i);
+  if (
+    !archivo
+    || !UUID.test(archivo[1])
+    || !UUID.test(archivo[2])
+    || !UUID.test(doc.usuario_id)
+    || archivo[1].toLowerCase() !== doc.usuario_id.toLowerCase()
+  ) {
+    return { ok: false, error: "El archivo asociado a este registro no es válido." };
+  }
+  const extension = archivo[3].toLowerCase();
+  const errorBucket = await asegurarBucketMedicoPrivado(supabase);
+  if (errorBucket) return { ok: false, error: errorBucket };
 
   const [ver, descarga] = await Promise.all([
     supabase.storage.from(BUCKET_ALTAS_MEDICAS).createSignedUrl(doc.archivo_path, 300),
     supabase.storage
       .from(BUCKET_ALTAS_MEDICAS)
-      .createSignedUrl(doc.archivo_path, 300, { download: doc.archivo_nombre ?? true }),
+      .createSignedUrl(doc.archivo_path, 300, { download: `certificado.${extension}` }),
   ]);
 
   if (ver.error || !ver.data || descarga.error || !descarga.data) {
@@ -69,8 +84,8 @@ export async function obtenerUrlsDocumento(docId: string): Promise<UrlsDocumento
     ok: true,
     urlVer: ver.data.signedUrl,
     urlDescarga: descarga.data.signedUrl,
-    nombre: doc.archivo_nombre ?? "Alta médica",
-    esImagen: /\.(jpe?g|png|webp)$/i.test(doc.archivo_path),
+    nombre: "Certificado médico",
+    esImagen: extension !== "pdf",
   };
 }
 
@@ -147,12 +162,13 @@ export async function cargarAltaPresencial(formData: FormData): Promise<Resultad
   if (errorFechas) return { ok: false, error: errorFechas };
 
   const supabase = createAdminClient();
-  const { data: usuario } = await supabase.from("usuarios").select("id").eq("id", usuarioId).maybeSingle();
+  const { data: usuario, error: errorUsuario } = await supabase.from("usuarios").select("id").eq("id", usuarioId).maybeSingle();
+  if (errorUsuario) return { ok: false, error: "No se pudo verificar el usuario." };
   if (!usuario) return { ok: false, error: "No encontramos al usuario." };
 
   let subido: { path: string; nombre: string } | null = null;
   if (archivo) {
-    const resultado = await subirArchivo(supabase, usuarioId, archivo);
+    const resultado = await subirArchivo(supabase, usuario.id, archivo);
     if (!resultado.ok) return { ok: false, error: resultado.error };
     subido = { path: resultado.path, nombre: resultado.nombre };
   }
@@ -190,11 +206,15 @@ export async function simularEnvioDigital(formData: FormData): Promise<Resultado
   if (!archivo) return { ok: false, error: "Elegí un archivo para simular el envío." };
 
   const supabase = createAdminClient();
-  const subido = await subirArchivo(supabase, usuarioId, archivo);
+  const { data: usuario, error: errorUsuario } = await supabase.from("usuarios").select("id").eq("id", usuarioId).maybeSingle();
+  if (errorUsuario) return { ok: false, error: "No se pudo verificar el usuario." };
+  if (!usuario) return { ok: false, error: "No encontramos al usuario." };
+
+  const subido = await subirArchivo(supabase, usuario.id, archivo);
   if (!subido.ok) return { ok: false, error: subido.error };
 
   const { error } = await supabase.from("documentacion_medica").insert({
-    usuario_id: usuarioId,
+    usuario_id: usuario.id,
     estado: "pendiente",
     origen: "digital",
     archivo_path: subido.path,

@@ -7,6 +7,7 @@ import { iniciarSesionCredencial, salirCredencial, subirAltaMedicaSocio } from "
 import { PerfilBadge } from "@/components/recepcion/SemaforoBadge";
 import { estilos } from "@/components/recepcion/estilos";
 import { LogoAtilra } from "@/components/ui/LogoAtilra";
+import { CONTACTO } from "@/lib/constants";
 import { formatearFecha, formatearFechaHora } from "@/lib/fechas";
 import { cn } from "@/lib/utils";
 import type { EstadoUsuario } from "@/types";
@@ -30,6 +31,32 @@ export interface NoticiaPortal {
 }
 
 type Seccion = "credencial" | "alta" | "noticias";
+
+function PrivacidadDatos() {
+  return (
+    <section aria-labelledby="privacidad-datos" className="mt-6 rounded-2xl border border-[#9AC201]/40 bg-white p-4 text-sm text-[#292929] shadow-sm">
+      <h2 id="privacidad-datos" className="font-bold">Privacidad y tratamiento de datos</h2>
+      <p className="mt-2 leading-relaxed">
+        El gimnasio utiliza tus datos para gestionar la credencial, verificar el acceso, administrar la afiliación o cuota,
+        recibir y revisar certificados médicos y comunicar novedades relacionadas con sus servicios.
+      </p>
+      <p className="mt-2 leading-relaxed">
+        Conforme a la Ley 25.326, podés solicitar acceso, rectificación o supresión de tus datos a través de los canales de contacto del gimnasio.
+      </p>
+      <p className="mt-2">
+        Contacto telefónico del gimnasio:{" "}
+        {CONTACTO.sede.telefonos.map((telefono, index) => (
+          <span key={telefono}>
+            {index > 0 && " · "}
+            <a className="font-semibold underline" href={`tel:${telefono.replace(/[^\d+]/g, "")}`}>
+              {telefono}
+            </a>
+          </span>
+        ))}
+      </p>
+    </section>
+  );
+}
 
 function AccesoDni() {
   const router = useRouter();
@@ -90,6 +117,7 @@ function AccesoDni() {
         </button>
         <p className="text-xs text-[#606062]">La sesión queda protegida en este dispositivo y vence automáticamente.</p>
       </form>
+      <PrivacidadDatos />
     </main>
   );
 }
@@ -344,6 +372,7 @@ export function MiCredencialPortal({
         {seccion === "credencial" && <Credencial usuario={usuario} estado={estado} />}
         {seccion === "alta" && <SubirAlta />}
         {seccion === "noticias" && <Cartelera noticias={noticias} />}
+        <PrivacidadDatos />
         <footer className="mt-6 text-center text-xs text-[#606062]">
           <span className="inline-flex items-center gap-1"><Fingerprint className="h-3.5 w-3.5" aria-hidden /> Credencial digital ATILRA</span>
         </footer>

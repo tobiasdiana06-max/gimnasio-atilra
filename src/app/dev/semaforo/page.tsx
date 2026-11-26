@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 
 // Página de verificación SOLO para desarrollo (usa service_role). Borrala al terminar la Etapa 1.
 export default async function DevSemaforoPage() {
-  if (process.env.NODE_ENV === "production") notFound();
+  if (process.env.NODE_ENV !== "development") notFound();
 
   const supabase = createAdminClient();
   const { data, error } = await supabase

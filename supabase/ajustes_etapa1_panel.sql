@@ -5,6 +5,11 @@
 -- El panel opera con service_role desde el servidor, después de verificar el rol admin_recepcion.
 -- ============================================================================
 
+-- Los certificados médicos solo se entregan mediante URLs firmadas temporales.
+update storage.buckets
+   set public = false
+ where id = 'altas-medicas';
+
 -- 0) (Opcional) Verificá qué columnas tiene hoy tu esquema:
 -- select table_name, column_name, data_type, is_nullable
 --   from information_schema.columns

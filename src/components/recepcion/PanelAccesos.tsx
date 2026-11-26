@@ -19,14 +19,15 @@ export interface UsuarioAcceso {
   perfil: string;
 }
 
+type UsuarioAccesoResumen = Omit<UsuarioAcceso, "id">;
+
 interface Acceso {
   id: string;
-  usuario_id: string;
   fecha_hora: string;
   semaforo: SemaforoAcceso;
   motivo: string;
   metodo: string;
-  usuario: UsuarioAcceso | null;
+  usuario: UsuarioAccesoResumen | null;
 }
 
 const colores: { value: string; label: string }[] = [
