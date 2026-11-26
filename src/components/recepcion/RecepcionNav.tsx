@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FileCheck2, Fingerprint, LogOut, Newspaper, TicketCheck, Users, ClipboardList } from "lucide-react";
+import { FileCheck2, Fingerprint, LockKeyhole, LogOut, Newspaper, TicketCheck, Users, ClipboardList } from "lucide-react";
 import { cerrarSesion } from "@/app/recepcion/actions/sesion";
 import { LogoAtilra } from "@/components/ui/LogoAtilra";
 import { cn } from "@/lib/utils";
@@ -96,18 +96,28 @@ export function RecepcionNav({ email, pendientes }: Props) {
         ))}
       </nav>
 
-      <div className="hidden border-t border-atilra-blanco/10 p-4 md:block">
-        <p className="mb-2 truncate text-xs text-atilra-blanco/60" title={email}>
-          {email}
-        </p>
+      <div className="border-t border-atilra-blanco/10 p-4">
         <form action={cerrarSesion}>
           <button
             type="submit"
-            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-atilra-blanco/80 transition hover:bg-atilra-blanco/10 hover:text-atilra-blanco"
+            className="flex w-full items-center gap-2 rounded-lg border border-atilra-blanco/20 px-3 py-2 text-sm font-bold text-atilra-blanco transition hover:bg-atilra-blanco/10"
           >
-            <LogOut className="h-4 w-4" aria-hidden /> Cerrar sesión
+            <LockKeyhole className="h-4 w-4" aria-hidden /> Bloquear sesión
           </button>
         </form>
+        <div className="mt-4 hidden md:block">
+          <p className="mb-2 truncate text-xs text-atilra-blanco/60" title={email}>
+            {email}
+          </p>
+          <form action={cerrarSesion}>
+            <button
+              type="submit"
+              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-atilra-blanco/80 transition hover:bg-atilra-blanco/10 hover:text-atilra-blanco"
+            >
+              <LogOut className="h-4 w-4" aria-hidden /> Cerrar sesión
+            </button>
+          </form>
+        </div>
       </div>
     </aside>
   );

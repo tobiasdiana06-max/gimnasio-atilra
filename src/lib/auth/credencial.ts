@@ -5,12 +5,12 @@ import { redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 const COOKIE_NAME = "atilra_mi_credencial";
-const DURACION_SEGUNDOS = 8 * 60 * 60;
+const DURACION_SEGUNDOS = 7 * 24 * 60 * 60;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function firmar(payload: string): string {
-  const clave = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!clave) throw new Error("Falta SUPABASE_SERVICE_ROLE_KEY para proteger la sesión de credencial.");
+  const clave = process.env.CRON_SECRET || process.env.TERMINAL_BRIDGE_SECRET;
+  if (!clave) throw new Error("Falta CRON_SECRET o TERMINAL_BRIDGE_SECRET para proteger la sesión de credencial.");
   return createHmac("sha256", clave).update(payload).digest("base64url");
 }
 

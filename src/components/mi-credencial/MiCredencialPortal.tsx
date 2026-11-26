@@ -79,6 +79,11 @@ function AccesoDni() {
           <input id="legajo-credencial" name="numero_legajo" type="text" autoComplete="off"
             className={estilos.input} placeholder="Dejalo vacío si sos invitado" />
         </div>
+        <div>
+          <label htmlFor="telefono-credencial" className={estilos.label}>Últimos 4 dígitos del teléfono (solo invitados)</label>
+          <input id="telefono-credencial" name="telefono_ultimos4" type="text" inputMode="numeric"
+            autoComplete="off" maxLength={4} className={estilos.input} placeholder="Dejalo vacío si no tenés teléfono registrado" />
+        </div>
         {error && <p role="alert" className="rounded-lg border border-semaforo-rojo bg-red-50 p-3 text-sm text-semaforo-rojo">{error}</p>}
         <button type="submit" disabled={ocupado} className={cn(estilos.btnPrimario, "w-full py-3")}>
           {ocupado ? "Verificando…" : "Ingresar a mi credencial"}
@@ -291,11 +296,13 @@ function Cartelera({ noticias }: { noticias: NoticiaPortal[] }) {
 
 export function MiCredencialPortal({
   usuario,
+  avisarTelefonoInvitado = false,
   estado,
   noticias,
   errorCarga,
 }: {
   usuario: UsuarioMiCredencial | null;
+  avisarTelefonoInvitado?: boolean;
   estado: EstadoUsuario | null;
   noticias: NoticiaPortal[];
   errorCarga?: string;
@@ -327,6 +334,12 @@ export function MiCredencialPortal({
       </header>
 
       <main className="flex-1 px-4 pb-8 pt-5">
+        {avisarTelefonoInvitado && usuario.perfil === "invitado" && (
+          <aside role="status" className="mb-4 rounded-2xl border border-[#9AC201]/50 bg-[#9AC201]/15 p-4 text-sm text-[#292929]">
+            <p className="font-bold">Agregá un teléfono para proteger tu credencial</p>
+            <p className="mt-1">Tu ficha no tiene un teléfono registrado. Acercate a recepción para cargarlo y reforzar la seguridad de tu cuenta.</p>
+          </aside>
+        )}
         {errorCarga && <p role="alert" className="mb-4 rounded-2xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">{errorCarga}</p>}
         {seccion === "credencial" && <Credencial usuario={usuario} estado={estado} />}
         {seccion === "alta" && <SubirAlta />}

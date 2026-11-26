@@ -4,28 +4,70 @@ import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { guardarSesionCredencial, requerirUsuarioCredencialId, cerrarSesionCredencial } from "@/lib/auth/credencial";
 import { ALTA_MEDICA_EXTENSION_POR_MIME, ALTA_MEDICA_MAX_BYTES, ALTA_MEDICA_MAX_MB, BUCKET_ALTAS_MEDICAS } from "@/lib/constants";
+import { mensajeEsperaIntentos, reservarIntentoLogin } from "@/lib/auth/limite-intentos";
 import { normalizarDni } from "@/lib/validaciones";
 import type { ResultadoAccion } from "@/types/recepcion";
 
 export async function iniciarSesionCredencial(formData: FormData): Promise<ResultadoAccion> {
   const dni = normalizarDni(String(formData.get("dni") ?? ""));
   const numeroLegajo = String(formData.get("numero_legajo") ?? "").trim();
-  if (dni.length < 7 || dni.length > 8) return { ok: false, error: "Ingresá un DNI válido." };
-
-  const { data, error } = await createAdminClient()
-    .from("usuarios")
-    .select("id, perfil, numero_legajo, activo")
-    .eq("dni", dni)
-    .maybeSingle();
-  if (error) return { ok: false, error: "No se pudieron verificar los datos. Probá nuevamente." };
-  if (!data || !data.activo) return { ok: false, error: "No pudimos verificar el DNI y los datos requeridos." };
-  if (data.perfil === "afiliado" && (!numeroLegajo || numeroLegajo !== String(data.numero_legajo ?? "").trim())) {
-    return { ok: false, error: "No pudimos verificar el DNI y los datos requeridos." };
+  const telefonoUltimos4 = normalizarDni(String(formData.get("telefono_ultimos4") ?? ""));
+  const intento = await reservarIntentoLogin(`credencial:${dni}`);
+  if (!intento.permitido) {
+    return { ok: false, error: mensajeEsperaIntentos(intento.esperaSegundos) };
   }
 
-  await guardarSesionCredencial(data.id);
-  revalidatePath("/mi-credencial");
-  return { ok: true, mensaje: "Datos verificados." };
+  let fallido = false;
+  try {
+    if (dni.length < 7 || dni.length > 8) {
+      fallido = true;
+      return { ok: false, error: "Ingresá un DNI válido." };
+    }
+
+    const { data, error } = await createAdminClient()
+      .from("usuarios")
+      .select("id, perfil, numero_legajo, telefono, activo")
+      .eq("dni", dni)
+      .maybeSingle();
+    if (error) return { ok: false, error: "No se pudieron verificar los datos. Probá nuevamente." };
+    if (!data || !data.activo) {
+      fallido = true;
+      return { ok: false, error: "No pudimos verificar el DNI y los datos requeridos." };
+    }
+
+    if (data.perfil === "afiliado") {
+      const legajoRegistrado = String(data.numero_legajo ?? "").trim();
+      if (!numeroLegajo || numeroLegajo !== legajoRegistrado) {
+        fallido = true;
+        return { ok: false, error: "No pudimos verificar el DNI y los datos requeridos." };
+      }
+    } else if (data.perfil === "invitado") {
+      const telefonoRegistrado = String(data.telefono ?? "").trim();
+      if (telefonoRegistrado) {
+        const digitosTelefono = telefonoRegistrado.replace(/\D/g, "");
+        if (
+          telefonoUltimos4.length !== 4
+          || digitosTelefono.length < 4
+          || telefonoUltimos4 !== digitosTelefono.slice(-4)
+        ) {
+          fallido = true;
+          return { ok: false, error: "No pudimos verificar el DNI y los datos requeridos." };
+        }
+      }
+    } else {
+      fallido = true;
+      return { ok: false, error: "No pudimos verificar el DNI y los datos requeridos." };
+    }
+
+    await guardarSesionCredencial(data.id);
+    revalidatePath("/mi-credencial");
+    return {
+      ok: true,
+      mensaje: "Datos verificados.",
+    };
+  } finally {
+    intento.finalizar(fallido);
+  }
 }
 
 export async function salirCredencial(): Promise<void> {

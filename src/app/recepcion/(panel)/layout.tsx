@@ -1,3 +1,4 @@
+import { AutoLockGuard } from "@/components/recepcion/AutoLockGuard";
 import { RecepcionNav } from "@/components/recepcion/RecepcionNav";
 import { requireRecepcion } from "@/lib/auth/recepcion";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -15,6 +16,7 @@ export default async function PanelRecepcionLayout({ children }: { children: Rea
 
   return (
     <div className="min-h-screen md:flex">
+      <AutoLockGuard />
       <RecepcionNav email={sesion.email} pendientes={count ?? 0} />
       <main className="min-w-0 flex-1 p-4 md:p-8">{children}</main>
     </div>

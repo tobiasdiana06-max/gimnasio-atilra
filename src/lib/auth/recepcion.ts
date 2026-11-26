@@ -8,9 +8,9 @@ export interface SesionRecepcion {
   email: string;
 }
 
-/** Atajo SOLO para desarrollo local: RECEPCION_AUTH_DISABLED=true en .env.local. Se ignora en producción. */
+/** El bypass de autenticación está limitado exclusivamente al entorno de desarrollo local. */
 function autenticacionDeshabilitada(): boolean {
-  return process.env.NODE_ENV !== "production" && process.env.RECEPCION_AUTH_DISABLED === "true";
+  return process.env.NODE_ENV === "development" && process.env.RECEPCION_AUTH_DISABLED === "true";
 }
 
 export async function obtenerSesionRecepcion(): Promise<SesionRecepcion | null> {
