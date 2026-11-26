@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FileCheck2, Fingerprint, LockKeyhole, LogOut, Newspaper, TicketCheck, Users, ClipboardList, FileDown } from "lucide-react";
+import { FileCheck2, Fingerprint, LockKeyhole, Newspaper, TicketCheck, Users, ClipboardList, FileDown } from "lucide-react";
 import { cerrarSesion } from "@/app/recepcion/actions/sesion";
 import { LogoAtilra } from "@/components/ui/LogoAtilra";
 import { cn } from "@/lib/utils";
@@ -68,26 +68,20 @@ export function RecepcionNav({ email, pendientes }: Props) {
   ];
 
   return (
-    <aside className="sticky top-0 z-30 bg-atilra-carbon text-atilra-blanco shadow-md">
+    <aside className="sticky top-0 z-30 bg-[#1e2421] text-white shadow-md">
       <div className="mx-auto max-w-[1440px] px-3 sm:px-5 lg:px-8">
-        <div className="flex items-center justify-between gap-3 border-b-4 border-atilra-verde py-3">
+        <div className="flex items-center justify-between gap-3 border-b border-white/10 py-3">
           <div className="flex min-w-0 items-center gap-3">
-            <LogoAtilra className="h-10 w-10 shrink-0" />
+            <span className="rounded-xl bg-white/10 p-1.5">
+              <LogoAtilra className="h-9 w-9 shrink-0" />
+            </span>
             <div className="min-w-0">
-              <p className="text-xs text-atilra-blanco/60">ATILRA · Gral. Rodríguez</p>
-              <p className="truncate text-base font-bold sm:text-lg">Gimnasio — Recepción</p>
+              <p className="text-xs font-semibold text-emerald-300">ATILRA · Seccional General Rodríguez</p>
+              <p className="truncate text-base font-bold text-white sm:text-lg">Recepción · Gimnasio ATILRA</p>
             </div>
           </div>
           <div className="hidden min-w-0 items-center gap-4 sm:flex">
-            <p className="max-w-64 truncate text-xs text-atilra-blanco/60" title={email}>{email}</p>
-            <form action={cerrarSesion}>
-              <button
-                type="submit"
-                className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-atilra-blanco/80 transition hover:bg-atilra-blanco/10 hover:text-atilra-blanco"
-              >
-                <LogOut className="h-4 w-4" aria-hidden /> Cerrar sesión
-              </button>
-            </form>
+            <p className="max-w-64 truncate text-xs text-white/65" title={email}>{email}</p>
           </div>
         </div>
 
@@ -99,10 +93,10 @@ export function RecepcionNav({ email, pendientes }: Props) {
                 href={href}
                 aria-current={activo ? "page" : undefined}
                 className={cn(
-                  "flex shrink-0 items-center gap-2 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold transition lg:flex-1 lg:justify-center lg:px-2",
+                  "flex shrink-0 items-center gap-2 whitespace-nowrap rounded-xl px-3 py-2 text-sm font-semibold transition lg:flex-1 lg:justify-center lg:px-2",
                   activo
-                    ? "bg-atilra-verde text-atilra-carbon"
-                    : "text-atilra-blanco/80 hover:bg-atilra-blanco/10 hover:text-atilra-blanco",
+                    ? "bg-emerald-500 text-white shadow-sm"
+                    : "text-white/75 hover:bg-white/10 hover:text-white",
                 )}
               >
                 <Icono className="h-4 w-4 shrink-0" aria-hidden />
@@ -119,7 +113,7 @@ export function RecepcionNav({ email, pendientes }: Props) {
             <form action={cerrarSesion}>
               <button
                 type="submit"
-                className="inline-flex items-center gap-2 whitespace-nowrap rounded-lg border border-atilra-blanco/20 px-3 py-2 text-sm font-bold text-atilra-blanco transition hover:bg-atilra-blanco/10"
+                className="inline-flex items-center gap-2 whitespace-nowrap rounded-xl border border-emerald-300/40 bg-emerald-500/10 px-3 py-2 text-sm font-bold text-white transition hover:bg-emerald-500/20"
               >
                 <LockKeyhole className="h-4 w-4" aria-hidden /> Bloquear sesión
               </button>
@@ -127,11 +121,11 @@ export function RecepcionNav({ email, pendientes }: Props) {
           </div>
         </div>
 
-        <div className="border-t border-atilra-blanco/10 py-2 lg:hidden">
+        <div className="border-t border-white/10 py-2 lg:hidden">
           <form action={cerrarSesion}>
             <button
               type="submit"
-              className="flex w-full items-center justify-center gap-2 rounded-lg border border-atilra-blanco/20 px-3 py-2 text-sm font-bold text-atilra-blanco transition hover:bg-atilra-blanco/10"
+              className="flex w-full items-center justify-center gap-2 rounded-xl border border-emerald-300/40 bg-emerald-500/10 px-3 py-2 text-sm font-bold text-white transition hover:bg-emerald-500/20"
             >
               <LockKeyhole className="h-4 w-4" aria-hidden /> Bloquear sesión
             </button>

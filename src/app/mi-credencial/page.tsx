@@ -50,7 +50,7 @@ export default async function MiCredencialPage() {
   const errorCarga = usuarioRes.error?.message ?? estadoRes.error?.message ?? noticiasRes.error?.message;
   const usuario = usuarioRes.data as (UsuarioMiCredencial & { telefono: string | null }) | null;
   return (
-    <div className="min-h-screen bg-[#F4F6F4]">
+    <div className="min-h-screen overflow-x-hidden bg-gradient-to-br from-slate-100 via-emerald-50/40 to-slate-200/70">
       <MiCredencialPortal
         usuario={usuario}
         avisarTelefonoInvitado={usuario?.perfil === "invitado" && !usuario.telefono?.trim()}

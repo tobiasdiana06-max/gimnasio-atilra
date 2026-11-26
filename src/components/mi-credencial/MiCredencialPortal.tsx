@@ -2,7 +2,23 @@
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { BadgeCheck, Bell, CalendarDays, Download, FileUp, Fingerprint, LogOut, Newspaper, ShieldAlert, UserRound } from "lucide-react";
+import {
+  BadgeCheck,
+  Bell,
+  CalendarDays,
+  Clock3,
+  Download,
+  FileCheck2,
+  FileUp,
+  Fingerprint,
+  LogOut,
+  MapPin,
+  Newspaper,
+  ShieldAlert,
+  Smartphone,
+  UserRound,
+  Users,
+} from "lucide-react";
 import { iniciarSesionCredencial, salirCredencial, subirAltaMedicaSocio } from "@/app/mi-credencial/actions";
 import { PerfilBadge } from "@/components/recepcion/SemaforoBadge";
 import { estilos } from "@/components/recepcion/estilos";
@@ -83,44 +99,109 @@ function AccesoDni({ planillaUrl, planillaError }: { planillaUrl: string | null;
   }
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center border-x border-slate-200 bg-[#F4F6F4] px-5 py-8 shadow-2xl lg:grid lg:max-w-5xl lg:grid-cols-[minmax(0,1.1fr)_minmax(380px,0.9fr)] lg:items-center lg:gap-x-10 lg:px-10 lg:shadow-xl">
-      <header className="mb-6 rounded-3xl border-b-4 border-[#9AC201] bg-[#292929] p-6 text-white shadow-lg lg:row-span-2 lg:mb-0 lg:p-8">
-        <div className="flex items-center gap-3">
-          <LogoAtilra className="h-11 w-11 shrink-0" />
+    <main className="min-h-screen overflow-x-hidden bg-gradient-to-br from-slate-100 via-emerald-50/40 to-slate-200/70 px-4 py-8 lg:py-12">
+      <div className="mx-auto grid w-full max-w-6xl grid-cols-1 items-stretch gap-8 lg:grid-cols-12">
+        <section className="flex flex-col justify-between gap-8 rounded-3xl bg-[#1e2421] p-6 text-white shadow-xl sm:p-8 lg:col-span-6">
           <div>
-            <p className="text-sm font-bold">Gimnasio ATILRA</p>
-            <p className="text-xs text-white/70">Seccional General Rodríguez (CCT 02/88)</p>
+            <div className="flex items-center gap-4">
+              <span className="rounded-2xl bg-white/10 p-2.5">
+                <LogoAtilra className="h-12 w-12" />
+              </span>
+              <div>
+                <p className="text-sm font-bold text-emerald-300">Mi Atilra</p>
+                <p className="text-xs text-white/70">Seccional General Rodríguez · CCT 02/88</p>
+              </div>
+            </div>
+            <h1 className="mt-8 text-3xl font-black leading-tight sm:text-4xl">
+              Gimnasio ATILRA
+            </h1>
+            <p className="mt-2 text-sm font-semibold text-emerald-300">Mi credencial digital</p>
+            <p className="mt-4 max-w-xl text-sm leading-relaxed text-white/75 sm:text-base">
+              Consultá tu estado, mantené tu documentación al día y accedé al gimnasio desde una sola aplicación.
+            </p>
           </div>
-        </div>
-        <h1 className="mt-5 text-3xl font-black">Mi Credencial</h1>
-        <p className="mt-2 text-sm text-white/75">Consultá tu estado, enviá el certificado médico y mirá las novedades.</p>
-      </header>
-      <form onSubmit={(event) => void ingresar(event)} className="mx-1 space-y-4 rounded-3xl bg-white p-6 shadow-lg lg:mx-0">
-        <div>
-          <label htmlFor="dni-credencial" className={estilos.label}>DNI</label>
-          <input id="dni-credencial" name="dni" type="text" inputMode="numeric" autoComplete="username"
-            minLength={7} maxLength={12} required className={estilos.input} placeholder="Tu número de DNI" />
-        </div>
-        <div>
-          <label htmlFor="legajo-credencial" className={estilos.label}>Número de legajo (solo afiliados)</label>
-          <input id="legajo-credencial" name="numero_legajo" type="text" autoComplete="off"
-            className={estilos.input} placeholder="Dejalo vacío si sos invitado" />
-        </div>
-        <div>
-          <label htmlFor="telefono-credencial" className={estilos.label}>Últimos 4 dígitos del teléfono (solo invitados)</label>
-          <input id="telefono-credencial" name="telefono_ultimos4" type="text" inputMode="numeric"
-            autoComplete="off" maxLength={4} className={estilos.input} placeholder="Dejalo vacío si no tenés teléfono registrado" />
-        </div>
-        {error && <p role="alert" className="rounded-lg border border-semaforo-rojo bg-red-50 p-3 text-sm text-semaforo-rojo">{error}</p>}
-        <button type="submit" disabled={ocupado} className={cn(estilos.btnPrimario, "w-full py-3")}>
-          {ocupado ? "Verificando…" : "Ingresar a mi credencial"}
-        </button>
-        <p className="text-xs text-[#606062]">La sesión queda protegida en este dispositivo y vence automáticamente.</p>
-      </form>
-      <div className="space-y-4 lg:col-start-2">
-        {planillaError && <p role="alert" className="rounded-2xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">{planillaError}</p>}
-        <BotonPlanilla url={planillaUrl} />
-        <PrivacidadDatos className="mt-0" />
+
+          <div className="space-y-3">
+            <article className="flex gap-3 rounded-2xl border border-white/10 bg-white/5 p-4">
+              <Clock3 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-300" aria-hidden />
+              <div>
+                <h2 className="text-sm font-bold text-white">Horarios y sede</h2>
+                <p className="mt-1 text-sm leading-relaxed text-white/70">Lunes a Viernes de 7:00 a 21:00 hs · General Rodríguez, Buenos Aires.</p>
+                <p className="mt-1 inline-flex items-center gap-1 text-xs text-white/55"><MapPin className="h-3.5 w-3.5" aria-hidden /> Gimnasio ATILRA</p>
+              </div>
+            </article>
+            <article className="flex gap-3 rounded-2xl border border-white/10 bg-white/5 p-4">
+              <FileCheck2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-300" aria-hidden />
+              <div>
+                <h2 className="text-sm font-bold text-white">Documentación y acceso</h2>
+                <p className="mt-1 text-sm leading-relaxed text-white/70">Presentá tu certificado de apto médico vigente y validá tu ingreso con huella o credencial digital.</p>
+              </div>
+            </article>
+            <article className="flex gap-3 rounded-2xl border border-white/10 bg-white/5 p-4">
+              <Smartphone className="mt-0.5 h-5 w-5 shrink-0 text-emerald-300" aria-hidden />
+              <div>
+                <h2 className="text-sm font-bold text-white">App en tu celular</h2>
+                <p className="mt-1 text-sm leading-relaxed text-white/70">Agregá Mi Atilra a tu pantalla de inicio para recibir alertas de vencimiento de cuota y apto médico.</p>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section className="rounded-3xl border border-slate-200/80 bg-white p-6 shadow-xl sm:p-8 lg:col-span-6">
+          <div className="mb-6">
+            <p className="text-sm font-semibold text-emerald-700">Acceso de afiliados e invitados</p>
+            <h2 className="mt-1 text-2xl font-black text-slate-900">Ingresá a tu credencial</h2>
+            <p className="mt-2 text-sm text-slate-600">Usá los datos que corresponden a tu perfil:</p>
+          </div>
+
+          <div className="mb-6 grid gap-3 sm:grid-cols-2">
+            <div className="rounded-xl border border-emerald-200 bg-emerald-50/70 p-3">
+              <p className="flex items-center gap-2 text-sm font-bold text-slate-900">
+                <Users className="h-4 w-4 text-emerald-700" aria-hidden /> Afiliado
+              </p>
+              <p className="mt-1 text-xs leading-relaxed text-slate-600">DNI + número de legajo</p>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+              <p className="flex items-center gap-2 text-sm font-bold text-slate-900">
+                <UserRound className="h-4 w-4 text-slate-600" aria-hidden /> Invitado
+              </p>
+              <p className="mt-1 text-xs leading-relaxed text-slate-600">DNI + últimos 4 dígitos del teléfono</p>
+            </div>
+          </div>
+
+          <form onSubmit={(event) => void ingresar(event)} className="space-y-4">
+            <div>
+              <label htmlFor="dni-credencial" className={estilos.label}>DNI</label>
+              <input id="dni-credencial" name="dni" type="text" inputMode="numeric" autoComplete="username"
+                minLength={7} maxLength={12} required className={cn(estilos.input, "border-slate-300 text-slate-900 focus:border-emerald-600 focus:ring-emerald-600/20")} placeholder="Tu número de DNI" />
+            </div>
+            <div>
+              <label htmlFor="legajo-credencial" className={estilos.label}>Número de legajo (solo afiliados)</label>
+              <input id="legajo-credencial" name="numero_legajo" type="text" autoComplete="off"
+                className={cn(estilos.input, "border-slate-300 text-slate-900 focus:border-emerald-600 focus:ring-emerald-600/20")} placeholder="Dejalo vacío si sos invitado" />
+            </div>
+            <div>
+              <label htmlFor="telefono-credencial" className={estilos.label}>Últimos 4 dígitos del teléfono (solo invitados)</label>
+              <input id="telefono-credencial" name="telefono_ultimos4" type="text" inputMode="numeric"
+                autoComplete="off" maxLength={4} className={cn(estilos.input, "border-slate-300 text-slate-900 focus:border-emerald-600 focus:ring-emerald-600/20")} placeholder="Dejalo vacío si no tenés teléfono registrado" />
+            </div>
+            {error && <p role="alert" className="rounded-lg border border-semaforo-rojo bg-red-50 p-3 text-sm text-semaforo-rojo">{error}</p>}
+            <button
+              type="submit"
+              disabled={ocupado}
+              className="inline-flex w-full items-center justify-center rounded-xl bg-[#047857] px-4 py-3.5 font-semibold text-white shadow-md transition-colors hover:bg-[#065f46] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {ocupado ? "Verificando…" : "Ingresar a mi credencial"}
+            </button>
+            <p className="text-xs text-slate-500">La sesión queda protegida en este dispositivo y vence automáticamente.</p>
+          </form>
+
+          <div className="mt-6 space-y-4 border-t border-slate-200 pt-5">
+            {planillaError && <p role="alert" className="rounded-2xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">{planillaError}</p>}
+            <BotonPlanilla url={planillaUrl} />
+            <PrivacidadDatos className="mt-0 border-slate-200 bg-slate-50 shadow-none" />
+          </div>
+        </section>
       </div>
     </main>
   );
@@ -334,85 +415,107 @@ function BotonPlanilla({ url }: { url: string | null }) {
 function Credencial({
   usuario,
   estado,
-  hoy,
   planillaUrl,
   claveVapidPublica,
 }: {
   usuario: UsuarioMiCredencial;
   estado: EstadoUsuario | null;
-  hoy: string;
   planillaUrl: string | null;
   claveVapidPublica: string;
 }) {
   const esAfiliado = usuario.perfil === "afiliado";
   return (
     <div className="space-y-4">
-      <article className="overflow-hidden rounded-3xl bg-white shadow-lg">
-        <div
-          className="h-2"
-          style={{
-            backgroundColor:
-              estado?.semaforo === "verde" ? "#16A34A"
-                : estado?.semaforo === "amarillo" ? "#EAB308"
-                  : estado?.semaforo === "rojo" ? "#DC2626" : "#606062",
-          }}
-        />
-        <div className="grid gap-6 p-4 sm:p-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)] lg:items-start">
-          <div className="min-w-0">
-            <div className="flex items-center gap-4">
-              {usuario.foto_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={usuario.foto_url} alt="" referrerPolicy="no-referrer" className="h-20 w-20 rounded-2xl object-cover ring-2 ring-slate-100" />
-              ) : (
-                <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-[#292929]">
-                  <UserRound className="h-10 w-10 text-[#9AC201]" aria-hidden />
-                </div>
-              )}
-              <div className="min-w-0">
-                <p className="text-xs font-bold uppercase tracking-widest text-[#606062]">Credencial digital</p>
-                <h2 className="mt-1 text-xl font-black leading-tight text-[#292929]">{usuario.nombre} {usuario.apellido}</h2>
-                <p className="mt-1 text-sm text-[#606062]">DNI {usuario.dni}</p>
+      <article className="overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-xl">
+        <div className="h-2 bg-gradient-to-r from-emerald-500 via-emerald-400 to-lime-400" />
+        <div className="bg-[#1e2421] p-5 text-white sm:p-6">
+          <div className="flex items-center gap-4">
+            {usuario.foto_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={usuario.foto_url} alt="" referrerPolicy="no-referrer" className="h-20 w-20 shrink-0 rounded-2xl object-cover ring-2 ring-white/20" />
+            ) : (
+              <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-white/10">
+                <UserRound className="h-10 w-10 text-emerald-300" aria-hidden />
               </div>
+            )}
+            <div className="min-w-0">
+              <p className="text-xs font-bold uppercase tracking-widest text-emerald-300">Credencial digital</p>
+              <h2 className="mt-1 break-words text-xl font-black leading-tight text-white">{usuario.nombre} {usuario.apellido}</h2>
+              <p className="mt-1 text-sm text-white/70">DNI {usuario.dni}</p>
             </div>
-            <div className="mt-4 flex flex-wrap items-center gap-2">
-              <PerfilBadge perfil={usuario.perfil} />
-              {esAfiliado && <span className="rounded-full bg-[#9AC201]/25 px-2.5 py-1 text-xs font-bold text-[#292929]">CCT 02/88</span>}
-              {esAfiliado && usuario.numero_legajo && (
-                <span className="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-[#606062]">
-                  Legajo {usuario.numero_legajo}
-                </span>
-              )}
-            </div>
-            <TarjetaSemaforo estado={estado} />
-            <AlertaVencimientos usuario={usuario} estado={estado} hoy={hoy} />
           </div>
-
-          <div className="min-w-0">
-            <NotificacionesPush clavePublica={claveVapidPublica} />
-            <BotonPlanilla url={planillaUrl} />
-
-            <div className="mt-5 grid grid-cols-2 gap-3">
-              <div className="min-w-0 rounded-2xl border border-slate-100 bg-[#F4F6F4] p-3.5">
-                <div className="mb-2 flex items-center gap-2 text-[#606062]">
-                  <CalendarDays className="h-4 w-4 shrink-0 text-[#7EA100]" aria-hidden />
-                  <p className="text-xs font-bold leading-tight">Alta Médica</p>
-                </div>
-                <p className="text-sm font-black text-[#292929]">{formatearFecha(estado?.alta_vencimiento)}</p>
-              </div>
-              <div className="min-w-0 rounded-2xl border border-slate-100 bg-[#F4F6F4] p-3.5">
-                <div className="mb-2 flex items-center gap-2 text-[#606062]">
-                  <CalendarDays className="h-4 w-4 shrink-0 text-[#7EA100]" aria-hidden />
-                  <p className="text-xs font-bold leading-tight">{esAfiliado ? "Afiliación" : "Cuota"}</p>
-                </div>
-                <p className="text-sm font-black text-[#292929]">
-                  {formatearFecha(esAfiliado ? estado?.afiliacion_vencimiento : estado?.cuota_vencimiento)}
-                </p>
-              </div>
-            </div>
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <PerfilBadge perfil={usuario.perfil} />
+            {esAfiliado && <span className="rounded-full bg-emerald-400/20 px-2.5 py-1 text-xs font-bold text-emerald-100">CCT 02/88</span>}
+            {esAfiliado && usuario.numero_legajo && (
+              <span className="rounded-full border border-white/20 px-3 py-1 text-xs font-semibold text-white/80">
+                Legajo {usuario.numero_legajo}
+              </span>
+            )}
           </div>
         </div>
+        <div className="p-4 sm:p-5">
+          <TarjetaSemaforo estado={estado} />
+        </div>
       </article>
+      <NotificacionesPush clavePublica={claveVapidPublica} />
+      <BotonPlanilla url={planillaUrl} />
+      <form action={salirCredencial} className="hidden lg:block">
+        <button type="submit" className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-3 font-semibold text-slate-700 shadow-sm transition hover:border-rose-300 hover:bg-rose-50 hover:text-rose-800">
+          <LogOut className="h-4 w-4" aria-hidden /> Cerrar sesión
+        </button>
+      </form>
     </div>
+  );
+}
+
+function ResumenCredencial({
+  usuario,
+  estado,
+  hoy,
+}: {
+  usuario: UsuarioMiCredencial;
+  estado: EstadoUsuario | null;
+  hoy: string;
+}) {
+  const esAfiliado = usuario.perfil === "afiliado";
+  return (
+    <section className="space-y-4">
+      <header className="rounded-2xl border border-emerald-100 bg-white p-5 shadow-sm sm:p-6">
+        <p className="text-sm font-semibold text-emerald-700">Resumen personal</p>
+        <h2 className="mt-1 text-2xl font-black text-slate-900">Estado de tu credencial</h2>
+        <p className="mt-1 text-sm text-slate-600">Revisá la vigencia de tu documentación y los datos de acceso.</p>
+      </header>
+      <AlertaVencimientos usuario={usuario} estado={estado} hoy={hoy} />
+      <div className="grid gap-4 sm:grid-cols-2">
+        <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="flex items-start gap-3">
+            <span className="rounded-xl bg-emerald-50 p-2.5 text-emerald-700">
+              <FileCheck2 className="h-5 w-5" aria-hidden />
+            </span>
+            <div>
+              <h3 className="font-bold text-slate-900">Certificado médico</h3>
+              <p className="mt-2 text-lg font-black text-slate-800">{formatearFecha(estado?.alta_vencimiento)}</p>
+              <p className="mt-1 text-xs text-slate-500">Fecha de vencimiento del apto vigente</p>
+            </div>
+          </div>
+        </article>
+        <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="flex items-start gap-3">
+            <span className="rounded-xl bg-emerald-50 p-2.5 text-emerald-700">
+              <CalendarDays className="h-5 w-5" aria-hidden />
+            </span>
+            <div>
+              <h3 className="font-bold text-slate-900">{esAfiliado ? "Afiliación" : "Cuota mensual"}</h3>
+              <p className="mt-2 text-lg font-black text-slate-800">
+                {formatearFecha(esAfiliado ? estado?.afiliacion_vencimiento : estado?.cuota_vencimiento)}
+              </p>
+              <p className="mt-1 text-xs text-slate-500">{esAfiliado ? "Vigencia de afiliación" : "Fecha de vencimiento de la cuota"}</p>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
   );
 }
 
@@ -547,57 +650,69 @@ export function MiCredencialPortal({
   ];
 
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-5xl flex-col border-x border-slate-200 bg-[#F4F6F4] pb-24 shadow-2xl lg:border-x-0 lg:pb-8 lg:shadow-xl">
-      <header className="sticky top-0 z-30 flex items-center justify-between gap-3 bg-[#292929] px-4 py-3 text-white shadow-md">
-        <div className="flex min-w-0 items-center gap-3">
-          <LogoAtilra className="h-10 w-10 shrink-0" />
-          <div className="min-w-0">
-            <p className="text-sm font-bold leading-tight">Gimnasio ATILRA</p>
-            <p className="mt-0.5 text-[11px] leading-tight text-white/70">Seccional General Rodríguez (CCT 02/88)</p>
+    <div className="min-h-screen w-full overflow-x-hidden bg-gradient-to-br from-slate-100 via-emerald-50/40 to-slate-200/70">
+      <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col border-x border-white/60 bg-white/30 pb-24 shadow-2xl lg:border-x-0 lg:pb-8 lg:shadow-xl">
+        <header className="sticky top-0 z-30 flex items-center justify-between gap-3 bg-[#1e2421] px-4 py-3 text-white shadow-md sm:px-6 lg:px-8">
+          <div className="flex min-w-0 items-center gap-3">
+            <span className="rounded-xl bg-white/10 p-1.5">
+              <LogoAtilra className="h-9 w-9 shrink-0" />
+            </span>
+            <div className="min-w-0">
+              <p className="text-sm font-bold leading-tight text-white">Mi Atilra · Gimnasio ATILRA</p>
+              <p className="mt-0.5 text-[11px] leading-tight text-emerald-200">Seccional General Rodríguez (CCT 02/88)</p>
+            </div>
           </div>
-        </div>
-        <form action={salirCredencial}>
-          <button type="submit" aria-label="Cerrar sesión" title="Cerrar sesión" className="rounded-full p-2 text-white/70 transition hover:bg-white/10 hover:text-white">
-            <LogOut className="h-4 w-4" aria-hidden />
-          </button>
-        </form>
-      </header>
+          <form action={salirCredencial} className="lg:hidden">
+            <button type="submit" aria-label="Cerrar sesión" title="Cerrar sesión" className="rounded-full p-2 text-white/75 transition hover:bg-white/10 hover:text-white">
+              <LogOut className="h-4 w-4" aria-hidden />
+            </button>
+          </form>
+        </header>
 
-      <main className="mx-auto w-full max-w-3xl flex-1 px-4 pb-8 pt-5 sm:px-6 lg:px-8 lg:pt-8">
-        {avisarTelefonoInvitado && usuario.perfil === "invitado" && (
-          <aside role="status" className="mb-4 rounded-2xl border border-[#9AC201]/50 bg-[#9AC201]/15 p-4 text-sm text-[#292929]">
-            <p className="font-bold">Agregá un teléfono para proteger tu credencial</p>
-            <p className="mt-1">Tu ficha no tiene un teléfono registrado. Acercate a recepción para cargarlo y reforzar la seguridad de tu cuenta.</p>
-          </aside>
-        )}
-        {errorCarga && <p role="alert" className="mb-4 rounded-2xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">{errorCarga}</p>}
-        {planillaError && <p role="alert" className="mb-4 rounded-2xl border border-red-200 bg-red-50 p-3 text-sm text-red-800">{planillaError}</p>}
-        {seccion === "credencial" && (
-          <Credencial
-            usuario={usuario}
-            estado={estado}
-            hoy={hoy}
-            planillaUrl={planillaUrl}
-            claveVapidPublica={claveVapidPublica}
-          />
-        )}
-        {seccion === "alta" && <SubirAlta />}
-        {seccion === "noticias" && <Cartelera noticias={noticias} />}
-        <PrivacidadDatos />
-        <footer className="mt-6 text-center text-xs text-[#606062]">
-          <span className="inline-flex items-center gap-1"><Fingerprint className="h-3.5 w-3.5" aria-hidden /> Credencial digital ATILRA</span>
-        </footer>
-      </main>
+        <main className="mx-auto w-full max-w-6xl flex-1 px-4 pb-8 pt-5 sm:px-6 lg:px-8 lg:pt-8">
+          <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
+            {avisarTelefonoInvitado && usuario.perfil === "invitado" && (
+              <aside role="status" className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-slate-800 lg:col-span-12">
+                <p className="font-bold">Agregá un teléfono para proteger tu credencial</p>
+                <p className="mt-1">Tu ficha no tiene un teléfono registrado. Acercate a recepción para cargarlo y reforzar la seguridad de tu cuenta.</p>
+              </aside>
+            )}
+            {errorCarga && <p role="alert" className="rounded-2xl border border-red-200 bg-red-50 p-3 text-sm text-red-800 lg:col-span-12">{errorCarga}</p>}
+            {planillaError && <p role="alert" className="rounded-2xl border border-red-200 bg-red-50 p-3 text-sm text-red-800 lg:col-span-12">{planillaError}</p>}
 
-      <nav aria-label="Secciones de mi credencial" className="fixed bottom-0 left-1/2 z-40 grid w-full max-w-5xl -translate-x-1/2 grid-cols-3 gap-1 border-x border-t border-white/10 bg-[#292929] px-2 pb-3 pt-2 shadow-2xl lg:bottom-5 lg:w-fit lg:grid-cols-[repeat(3,minmax(150px,1fr))] lg:rounded-2xl lg:border lg:pb-2">
-        {tabs.map(({ id, label, icon: Icon }) => (
-          <button key={id} type="button" onClick={() => setSeccion(id)} aria-current={seccion === id ? "page" : undefined}
-            className={cn("flex min-h-14 flex-col items-center justify-center gap-1 rounded-xl px-1 py-2 text-[11px] font-bold transition",
-              seccion === id ? "bg-[#9AC201] text-[#292929]" : "text-white/70 hover:bg-white/10 hover:text-white")}>
-            <Icon className="h-5 w-5" aria-hidden /> {label}
-          </button>
-        ))}
-      </nav>
+            <div className={cn("min-w-0 lg:col-span-5", seccion !== "credencial" && "hidden lg:block")}>
+              <Credencial
+                usuario={usuario}
+                estado={estado}
+                planillaUrl={planillaUrl}
+                claveVapidPublica={claveVapidPublica}
+              />
+            </div>
+            <div className="min-w-0 lg:col-span-7">
+              {seccion === "credencial" && <ResumenCredencial usuario={usuario} estado={estado} hoy={hoy} />}
+              {seccion === "alta" && <SubirAlta />}
+              {seccion === "noticias" && <Cartelera noticias={noticias} />}
+            </div>
+          </div>
+
+          <div className="mt-6">
+            <PrivacidadDatos className="mt-0" />
+          </div>
+          <footer className="mt-6 text-center text-xs text-slate-500">
+            <span className="inline-flex items-center gap-1"><Fingerprint className="h-3.5 w-3.5" aria-hidden /> Credencial digital ATILRA</span>
+          </footer>
+        </main>
+
+        <nav aria-label="Secciones de mi credencial" className="fixed bottom-0 left-1/2 z-40 grid w-full max-w-6xl -translate-x-1/2 grid-cols-3 gap-1 border-x border-t border-white/10 bg-[#1e2421] px-2 pb-3 pt-2 shadow-2xl lg:bottom-5 lg:w-fit lg:grid-cols-[repeat(3,minmax(150px,1fr))] lg:rounded-2xl lg:border lg:pb-2">
+          {tabs.map(({ id, label, icon: Icon }) => (
+            <button key={id} type="button" onClick={() => setSeccion(id)} aria-current={seccion === id ? "page" : undefined}
+              className={cn("flex min-h-14 flex-col items-center justify-center gap-1 rounded-xl px-1 py-2 text-[11px] font-bold transition",
+                seccion === id ? "bg-emerald-500 text-white" : "text-white/70 hover:bg-white/10 hover:text-white")}>
+              <Icon className="h-5 w-5" aria-hidden /> {label}
+            </button>
+          ))}
+        </nav>
+      </div>
     </div>
   );
 }

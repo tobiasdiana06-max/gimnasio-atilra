@@ -15,7 +15,7 @@ export default async function PanelRecepcionLayout({ children }: { children: Rea
     .eq("estado", "pendiente");
 
   return (
-    <div className="min-h-screen bg-atilra-fondo">
+    <div className="min-h-screen bg-slate-100">
       <AutoLockGuard />
       <RecepcionNav email={sesion.email} pendientes={count ?? 0} />
       <main className="mx-auto min-w-0 w-full max-w-[1440px] px-4 py-5 sm:px-6 sm:py-6 lg:px-10 lg:py-8">

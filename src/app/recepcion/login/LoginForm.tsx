@@ -10,7 +10,7 @@ export function LoginForm() {
   const [estado, accion, pendiente] = useActionState(iniciarSesion, inicial);
 
   return (
-    <form action={accion} className="space-y-4 rounded-2xl bg-atilra-blanco p-6 shadow">
+    <form action={accion} className="space-y-5">
       <div>
         <label className={estilos.label} htmlFor="email">
           Email

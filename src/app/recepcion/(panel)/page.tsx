@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowUpRight, CreditCard, FileCheck2, LogIn, Users } from "lucide-react";
+import { ArrowUpRight, CreditCard, FileCheck2, Fingerprint, LogIn, UserPlus, Users } from "lucide-react";
 import { PadronUsuarios, type FilaPadron } from "@/components/recepcion/PadronUsuarios";
 import { estilos } from "@/components/recepcion/estilos";
 import { requireRecepcion } from "@/lib/auth/recepcion";
@@ -113,13 +113,21 @@ export default async function PadronPage() {
     },
   ];
 
+  const accesosRapidos = [
+    { href: "/recepcion#padron", titulo: "Registrar nuevo usuario", detalle: "Abrir el padrón de usuarios", Icono: UserPlus },
+    { href: "/recepcion/cuotas", titulo: "Cargar pago de cuota", detalle: "Registrar o consultar pagos", Icono: CreditCard },
+    { href: "/recepcion/altas-medicas", titulo: "Revisar altas médicas pendientes", detalle: "Validar documentación recibida", Icono: FileCheck2 },
+    { href: "/recepcion/terminal", titulo: "Abrir terminal de accesos", detalle: "Registrar ingresos al gimnasio", Icono: Fingerprint },
+  ];
+
   return (
     <div className="space-y-7">
       <section aria-labelledby="resumen-operativo" className="space-y-4">
         <div className="flex flex-wrap items-end justify-between gap-2">
           <div>
-            <h1 id="resumen-operativo" className="text-2xl font-bold text-atilra-carbon">Resumen operativo</h1>
-            <p className="text-sm text-atilra-gris">Indicadores del día · {formatearFecha(hoy)}</p>
+            <p className="text-sm font-semibold uppercase tracking-wide text-emerald-700">Gimnasio ATILRA · Seccional General Rodríguez</p>
+            <h1 id="resumen-operativo" className="mt-1 text-2xl font-black text-slate-900 sm:text-3xl">Bienvenido a Recepción</h1>
+            <p className="mt-1 text-sm text-slate-600">Resumen operativo del día · {formatearFecha(hoy)}</p>
           </div>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -127,18 +135,41 @@ export default async function PadronPage() {
             <Link
               key={titulo}
               href={href}
-              className={cn(estilos.card, "group flex min-h-36 items-start justify-between gap-3 transition hover:-translate-y-0.5 hover:shadow-md")}
+              className={cn(estilos.card, "group flex min-h-36 items-start justify-between gap-3 border-l-4 border-l-emerald-600 transition hover:-translate-y-0.5 hover:shadow-md")}
             >
               <div className="min-w-0">
-                <p className="text-sm font-semibold text-atilra-gris">{titulo}</p>
-                <p className="mt-2 text-3xl font-black tabular-nums text-atilra-carbon">{valor}</p>
-                <p className="mt-1 text-xs text-atilra-gris">{detalle}</p>
+                <p className="text-sm font-semibold text-slate-600">{titulo}</p>
+                <p className="mt-2 text-3xl font-black tabular-nums text-slate-900">{valor}</p>
+                <p className="mt-1 text-xs text-slate-500">{detalle}</p>
                 <span className="mt-4 inline-flex items-center gap-1 text-xs font-bold text-atilra-verde-oscuro">
                   {enlace} <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden />
                 </span>
               </div>
               <span className={cn("rounded-xl p-3", iconoClase)}>
                 <Icono className="h-5 w-5" aria-hidden />
+              </span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section aria-labelledby="accesos-rapidos" className="space-y-3">
+        <div>
+          <h2 id="accesos-rapidos" className="text-xl font-bold text-slate-900">Accesos rápidos operativos</h2>
+          <p className="mt-1 text-sm text-slate-600">Atajos a las tareas más frecuentes del equipo.</p>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          {accesosRapidos.map(({ href, titulo, detalle, Icono }) => (
+            <Link key={href} href={href} className="group flex min-h-28 items-start gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-md">
+              <span className="rounded-xl bg-emerald-50 p-2.5 text-emerald-800">
+                <Icono className="h-5 w-5" aria-hidden />
+              </span>
+              <span className="min-w-0">
+                <span className="block font-bold leading-snug text-slate-900">{titulo}</span>
+                <span className="mt-1 block text-xs leading-relaxed text-slate-600">{detalle}</span>
+                <span className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-emerald-800">
+                  Ir a sección <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden />
+                </span>
               </span>
             </Link>
           ))}
